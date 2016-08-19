@@ -1,6 +1,3 @@
-
-
-
 def user_comments(self):
     return [line for line in self.line_map if line.is_user_comment]
 
@@ -51,17 +48,48 @@ def blocks(self, begin=0, end=None, select=None):
                     current_block_num = line.block_num
         return blocks
 
-def tier(self, *tier):
+def tier(self, *tiers):
     results = []
     print tier
     for line in self.line_map:
-        if line.tier in tier:
+        if line.tier in tiers:
             results.append(line)
         if line.multi_line_parent and\
-           line.multi_line_parent.tier in tier:
+           line.multi_line_parent.tier in tiers:
             results.append(line)
     return results
 
+def time(self, begin=None, end=None):
+    results = []
+
+    region_started = False
+    region_ended = False
+
+    if begin and not end:
+        for line in self.line_map:
+            if line.time_onset >= begin:
+                region_started = True
+            if region_started:
+                results.append(line)
+
+    elif end and not begin:
+        for line in self.line_map:
+            if line.time_offset >= end:
+                region_ended = True
+            if not region_ended:
+                if line.is_header:
+                    continue
+                results.append(line)
+
+    elif begin and end:
+        for line in self.line_map:
+            if line.time_onset >= end:
+                region_ended = True
+            if line.time_onset >= begin:
+                region_started = True
+            if region_started and not region_ended:
+                results.append(line)
+
+    return results
+
 from elements import *
-
-

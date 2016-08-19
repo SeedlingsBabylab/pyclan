@@ -46,7 +46,6 @@ class ClanBlock(object):
         self.length = self.offset - self.onset
 
 
-
 interval_regx = re.compile("\\x15\d+_\d+\\x15")
 block_regx = re.compile("Conversation (\d+)")
 xdb_regx = re.compile("average_dB=\"([-+]?[0-9]*\.?[0-9]+)\" peak_dB=\"([-+]?[0-9]*\.?[0-9]+)\"")

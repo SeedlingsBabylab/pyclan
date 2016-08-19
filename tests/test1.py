@@ -21,5 +21,11 @@ if __name__ == "__main__":
 
     all_CHN_tiers = clan_file.get_tiers("CHN")
 
+    between_11378_and_59023 = clan_file.get_within_time(begin=11378, end=59023)
+
+    greater_than_123456 = clan_file.get_within_time(begin=123456)
+
+    less_than_123456 = clan_file.get_within_time(end=123456)
+
     print
 

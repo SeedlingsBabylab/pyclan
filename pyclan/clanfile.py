@@ -10,6 +10,7 @@ class ClanFile(object):
     get_block = filters.block
     get_blocks = filters.blocks
     get_tiers = filters.tier
+    get_within_time = filters.time
 
     def __init__(self, path):
         self.clan_path = path
@@ -113,7 +114,6 @@ class ClanFile(object):
                         clan_line.within_conv_block = True
                     else:
                         clan_line.block_num = 0
-                        #clan_line.within_conv_block = False
                     if line.startswith("*"):
                         clan_line.tier = line[1:4]
                         clan_line.content = line.split("\t")[1].replace(timestamp+"\n", "")
