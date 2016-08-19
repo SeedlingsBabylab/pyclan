@@ -1,45 +1,23 @@
 import csv
-import re
 import os
 
-from collections import OrderedDict
-
-interval_regx = re.compile("\\x15\d+_\d+\\x15")
-block_regx = re.compile("Conversation (\d+)")
-xdb_regx = re.compile("average_dB=\"([-+]?[0-9]*\.?[0-9]+)\" peak_dB=\"([-+]?[0-9]*\.?[0-9]+)\"")
-
-class ClanLine(object):
-    def __init__(self, index, line):
-        self.index = index
-        self.line = line
-        self.is_header = False
-        self.is_block_delimiter = False
-        self.time_onset = 0
-        self.time_offset = 0
-        self.block_num = 0
-        self.within_conv_block = False
-        self.clan_comment = False
-        self.user_comment = False
-        self.xdb_line = False
-        self.tier = None
-        self.content = None
-        self.xdb_average = 0
-        self.xdb_peak = 0
-
-    def timestamp(self):
-         return "{}_{}".format(self.time_onset, self.time_offset)
-
+from filter import *
+from elements import *
 
 class ClanFile(object):
+
+    get_user_comments = user_comments
+    get_block = block
+    get_blocks = blocks
 
     def __init__(self, path):
         self.clan_path = path
         self.filename = os.path.basename(self.clan_path)
-        self.file_map = self.parse_file()
-
+        self.num_blocks = 0
+        self.line_map = self.parse_file()
 
     def parse_file(self):
-        file_map = OrderedDict()
+        line_map = []
         with open(self.clan_path, "rU") as input:
             current_block = 0
 
@@ -65,7 +43,7 @@ class ClanFile(object):
                                 clan_line.is_block_delimiter = True
                                 clan_line.block_num = current_block
                                 clan_line.within_conv_block = True
-                                file_map[index] = clan_line
+                                line_map.append(clan_line)
                                 continue
                         clan_line.is_block_delimiter = block_delimiter
                         if block_started:
@@ -74,13 +52,13 @@ class ClanFile(object):
                         else:
                             clan_line.block_num = 0
                             #clan_line.within_conv_block = False
-                        file_map[index] = clan_line
+                        line_map.append(clan_line)
                         continue
 
                     clan_line.is_header = True
                     clan_line.time_onset = None
                     clan_line.time_offset = None
-                    file_map[index] = clan_line
+                    line_map.append(clan_line)
                     continue
 
                 if line.startswith("%com:") or line.startswith("%xcom:"):
@@ -90,12 +68,24 @@ class ClanFile(object):
                         clan_line.user_comment = True
                     clan_line.content = line.split("\t")[1]
 
+                    if block_started:
+                        clan_line.block_num = current_block
+                        clan_line.within_conv_block = True
+                    else:
+                        clan_line.block_num = 0
+
                 if line.startswith("%xdb:"):
                     clan_line.xdb_line = True
                     xdb_regx_result = xdb_regx.search(line)
                     if xdb_regx_result:
                         clan_line.xdb_average = xdb_regx_result.group(1)
                         clan_line.xdb_peak = xdb_regx_result.group(2)
+
+                    if block_started:
+                        clan_line.block_num = current_block
+                        clan_line.within_conv_block = True
+                    else:
+                        clan_line.block_num = 0
 
 
                 interv_regx_result = interval_regx.search(line)
@@ -115,9 +105,10 @@ class ClanFile(object):
                     if line.startswith("*"):
                         clan_line.tier = line[1:4]
                         clan_line.content = line.split("\t")[1].replace(timestamp+"\n", "")
-                file_map[index] = clan_line
+                line_map.append(clan_line)
 
-        return file_map
+        self.num_blocks = current_block
+        return line_map
 
     def block_map(self):
         return True
@@ -130,6 +121,6 @@ class ClanFile(object):
 
     def write_to_cha(self, path):
         with open(path, "wb") as output:
-            for _, line in self.file_map.iteritems():
+            for line in self.line_map:
                 output.write(line.line)
 
