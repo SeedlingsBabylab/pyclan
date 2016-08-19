@@ -9,7 +9,16 @@ This is a library for working with CLAN (.cha) files
 
 import pyclan
 
+
+# First construct a ClanFile object by giving it a path
+# to a .cha file. It will parse  the file upon construction.
+# After that, you're ready to use the library.
 clan_file = ClanFile("/path/to/cha/file.cha")
+
+
+
+# Example methods on ClanFile object:
+
 
 # pull out all comments entered by the user
 # It'll leave out machine generated comments
