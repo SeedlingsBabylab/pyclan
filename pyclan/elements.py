@@ -8,12 +8,15 @@ class ClanLine(object):
         self.line = line
         self.is_header = False
         self.is_block_delimiter = False
+        self.is_tier_line = False
+        self.multi_line_parent = None
+        self.is_multi_parent = False
         self.time_onset = 0
         self.time_offset = 0
         self.block_num = 0
         self.within_conv_block = False
-        self.clan_comment = False
-        self.user_comment = False
+        self.is_clan_comment = False
+        self.is_user_comment = False
         self.xdb_line = False
         self.tier = None
         self.content = None
@@ -27,7 +30,6 @@ class ClanBlock(object):
 
     get_user_comments = filter.user_comments
 
-
     def __init__(self, block_index, line_map):
         self.index = block_index
         self.line_map = line_map
@@ -40,6 +42,8 @@ class ClanBlock(object):
             if line.time_offset != 0:
                 self.offset = line.time_offset
                 break
+
+        self.length = self.offset - self.onset
 
 
 

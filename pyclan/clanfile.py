@@ -1,14 +1,14 @@
 import csv
 import os
 
-from filter import *
+import filter
 from elements import *
 
 class ClanFile(object):
 
-    get_user_comments = user_comments
-    get_block = block
-    get_blocks = blocks
+    get_user_comments = filter.user_comments
+    get_block = filter.block
+    get_blocks = filter.blocks
 
     def __init__(self, path):
         self.clan_path = path
@@ -23,6 +23,8 @@ class ClanFile(object):
 
             block_started = False
             block_ended = False
+
+            last_line = None
             for index, line in enumerate(input):
 
                 clan_line = ClanLine(index, line)
@@ -44,6 +46,7 @@ class ClanFile(object):
                                 clan_line.block_num = current_block
                                 clan_line.within_conv_block = True
                                 line_map.append(clan_line)
+                                last_line = clan_line
                                 continue
                         clan_line.is_block_delimiter = block_delimiter
                         if block_started:
@@ -51,15 +54,23 @@ class ClanFile(object):
                             clan_line.within_conv_block = True
                         else:
                             clan_line.block_num = 0
-                            #clan_line.within_conv_block = False
                         line_map.append(clan_line)
+                        last_line = clan_line
                         continue
 
                     clan_line.is_header = True
                     clan_line.time_onset = None
                     clan_line.time_offset = None
                     line_map.append(clan_line)
+                    last_line = clan_line
                     continue
+
+                if line.startswith("\t"):
+                    if last_line.is_user_comment or last_line.is_tier_line:
+                        last_line.is_multi_parent = True
+                        clan_line.multi_line_parent = last_line
+                    else:
+                        clan_line.multi_line_parent = last_line.multi_line_parent
 
                 if line.startswith("%com:") or line.startswith("%xcom:"):
                     if line.count("|") > 3:
@@ -105,7 +116,9 @@ class ClanFile(object):
                     if line.startswith("*"):
                         clan_line.tier = line[1:4]
                         clan_line.content = line.split("\t")[1].replace(timestamp+"\n", "")
+                        clan_line.is_tier_line = True
                 line_map.append(clan_line)
+                last_line = clan_line
 
         self.num_blocks = current_block
         return line_map

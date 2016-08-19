@@ -2,7 +2,7 @@
 
 
 def user_comments(self):
-    return [line for line in self.line_map if line.user_comment]
+    return [line for line in self.line_map if line.is_user_comment]
 
 def block(self, block_num):
     line_map = []

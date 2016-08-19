@@ -15,10 +15,10 @@ clan_file = ClanFile("/path/to/cha/file.cha")
 # It will leave out machine generated comments
 all_user_comments = clan_file.get_user_comments()
 
-# get a specific conversation block by index
+# get a single specific conversation block by index
 block_33 = clan_file.get_block(33)
 
-# get a group of convo blocks by specific index
+# get a group of blocks by specific index
 blocks_5_19_12_and_45 = clan_file.get_blocks(select=[5, 19, 12, 45])
 
 # get a range of blocks

@@ -11,11 +11,11 @@ if __name__ == "__main__":
 
     all_user_comments = clan_file.get_user_comments()
 
-    #blocks_3_to_7 = clan_file.blocks()
-
     block_33 = clan_file.get_block(33)
 
     blocks_5_19_12_and_45 = clan_file.get_blocks(select=[5, 19, 12, 45])
+
+    block_18 = clan_file.get_block(18) # block 18 has a Multi-line CHN tier.
 
     print
 
