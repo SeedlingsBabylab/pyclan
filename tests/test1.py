@@ -17,5 +17,9 @@ if __name__ == "__main__":
 
     block_18 = clan_file.get_block(18) # block 18 has a Multi-line CHN tier.
 
+    all_FAN_and_MAN_tiers = clan_file.get_tiers("FAN", "MAN")
+
+    all_CHN_tiers = clan_file.get_tiers("CHN")
+
     print
 

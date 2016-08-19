@@ -1,6 +1,6 @@
 import re
 
-import filter
+import filters
 
 class ClanLine(object):
     def __init__(self, index, line):
@@ -28,7 +28,7 @@ class ClanLine(object):
 
 class ClanBlock(object):
 
-    get_user_comments = filter.user_comments
+    get_user_comments = filters.user_comments
 
     def __init__(self, block_index, line_map):
         self.index = block_index

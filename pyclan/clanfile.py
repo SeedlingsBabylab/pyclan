@@ -1,14 +1,15 @@
 import csv
 import os
 
-import filter
+import filters
 from elements import *
 
 class ClanFile(object):
 
-    get_user_comments = filter.user_comments
-    get_block = filter.block
-    get_blocks = filter.blocks
+    get_user_comments = filters.user_comments
+    get_block = filters.block
+    get_blocks = filters.blocks
+    get_tiers = filters.tier
 
     def __init__(self, path):
         self.clan_path = path

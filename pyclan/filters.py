@@ -12,7 +12,6 @@ def block(self, block_num):
 
     return ClanBlock(block_num, line_map)
 
-
 def blocks(self, begin=0, end=None, select=None):
     blocks = []
 
@@ -52,6 +51,16 @@ def blocks(self, begin=0, end=None, select=None):
                     current_block_num = line.block_num
         return blocks
 
+def tier(self, *tier):
+    results = []
+    print tier
+    for line in self.line_map:
+        if line.tier in tier:
+            results.append(line)
+        if line.multi_line_parent and\
+           line.multi_line_parent.tier in tier:
+            results.append(line)
+    return results
 
 from elements import *
 
