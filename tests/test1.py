@@ -36,5 +36,7 @@ if __name__ == "__main__":
 
     #clan_file.set_content_from_new_map(new_editted_line_map)
 
+    clan_file.write_to_cha("31_14_new.cha")
+
     print
 

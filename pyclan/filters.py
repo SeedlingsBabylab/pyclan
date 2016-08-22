@@ -52,7 +52,6 @@ def conv_blocks(self, begin=0, end=None, select=None):
 
 def tier(self, *tiers):
     results = []
-    print tier
     for line in self.line_map:
         if line.tier in tiers:
             results.append(line)

@@ -67,7 +67,9 @@ clan_file.replace_with_keyword(lines_with_keywords, "apple", "blueberry")
 # method. replace_with_keyword() will only replace lines that
 # are in that dictionary.
 
-
+# You can then save those edits you made by calling the
+# write_to_cha() method on the clan_file object
+clan_file.write_to_cha("/path/to/new/cha/file_with_edits.cha")
 
 
 ```
