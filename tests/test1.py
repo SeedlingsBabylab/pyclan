@@ -1,6 +1,7 @@
 import sys
 
 import pyclan
+from pyclan.filters import *
 
 
 if __name__ == "__main__":
@@ -11,11 +12,11 @@ if __name__ == "__main__":
 
     all_user_comments = clan_file.get_user_comments()
 
-    block_33 = clan_file.get_block(33)
+    block_33 = clan_file.get_conv_block(33)
 
-    blocks_5_19_12_and_45 = clan_file.get_blocks(select=[5, 19, 12, 45])
+    blocks_5_19_12_and_45 = clan_file.get_conv_blocks(select=[5, 19, 12, 45])
 
-    block_18 = clan_file.get_block(18) # block 18 has a Multi-line CHN tier.
+    block_18 = clan_file.get_conv_block(18) # block 18 has a Multi-line CHN tier.
 
     all_FAN_and_MAN_tiers = clan_file.get_tiers("FAN", "MAN")
 
@@ -26,6 +27,14 @@ if __name__ == "__main__":
     greater_than_123456 = clan_file.get_within_time(begin=123456)
 
     less_than_123456 = clan_file.get_within_time(end=123456)
+
+
+
+    lines_with_keyword = clan_file.get_with_keyword("apple")
+
+    clan_file.replace_with_keyword(lines_with_keyword, "apple", "blueberry")
+
+    #clan_file.set_content_from_new_map(new_editted_line_map)
 
     print
 

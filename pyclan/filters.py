@@ -1,15 +1,17 @@
+from collections import OrderedDict
+
 def user_comments(self):
     return [line for line in self.line_map if line.is_user_comment]
 
-def block(self, block_num):
+def conv_block(self, block_num):
     line_map = []
     for index, line in enumerate(self.line_map):
-        if line.block_num == block_num:
+        if line.conv_block_num == block_num:
             line_map.append(line)
 
     return ClanBlock(block_num, line_map)
 
-def blocks(self, begin=0, end=None, select=None):
+def conv_blocks(self, begin=0, end=None, select=None):
     blocks = []
 
     if select:
@@ -18,8 +20,8 @@ def blocks(self, begin=0, end=None, select=None):
 
         current_block = []
         for line in self.line_map:
-            if line.block_num in selection_list:
-                if line.block_num == current_block_num:
+            if line.conv_block_num in selection_list:
+                if line.conv_block_num == current_block_num:
                     current_block.append(line)
                     if current_block_num == selection_list[-1]:
                         blocks.append(ClanBlock(current_block_num, current_block))
@@ -28,15 +30,15 @@ def blocks(self, begin=0, end=None, select=None):
                     blocks.append(ClanBlock(current_block_num, current_block))
                     current_block = []
                     current_block.append(line)
-                    current_block_num = line.block_num
+                    current_block_num = line.conv_block_num
         return blocks
 
     if begin and end:
         current_block_num = begin
         current_block = []
         for line in self.line_map:
-            if line.block_num >= current_block_num:
-                if line.block_num == current_block_num:
+            if line.conv_block_num >= current_block_num:
+                if line.conv_block_num == current_block_num:
                     current_block.append(line)
                     if current_block_num == end:
                         blocks.append(ClanBlock(current_block_num, current_block))
@@ -45,7 +47,7 @@ def blocks(self, begin=0, end=None, select=None):
                     blocks.append(ClanBlock(current_block_num, current_block))
                     current_block = []
                     current_block.append(line)
-                    current_block_num = line.block_num
+                    current_block_num = line.conv_block_num
         return blocks
 
 def tier(self, *tiers):
@@ -91,5 +93,22 @@ def time(self, begin=None, end=None):
                 results.append(line)
 
     return results
+
+def get_with_keyword(self, keyword):
+    line_map = OrderedDict()
+
+    for index, line in enumerate(self.line_map):
+        if line.content:
+            if keyword in line.content:
+                line_map[index] = line
+
+    return line_map
+
+def replace_with_keyword(self, line_map, orig_key, new_key):
+    for index, line in line_map.items():
+        if orig_key in line.content:
+            line.content = line.content.replace(orig_key, new_key)
+            line.line  = line.line.replace(orig_key, new_key)
+    return line_map
 
 from elements import *
