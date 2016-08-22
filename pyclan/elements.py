@@ -1,4 +1,5 @@
 import re
+import itertools
 
 import filters
 
@@ -14,6 +15,7 @@ class ClanLine(object):
         self.is_multi_parent = False
         self.time_onset = 0
         self.time_offset = 0
+        self.total_time = 0
         self.conv_block_num = 0
         self.within_conv_block = False
         self.within_paus_block = False
@@ -28,9 +30,19 @@ class ClanLine(object):
     def timestamp(self):
          return "{}_{}".format(self.time_onset, self.time_offset)
 
+class LineRange(object):
+
+    get_user_comments = filters.user_comments
+    get_tiers = filters.tier
+
+    def __init__(self, line_range):
+        self.line_map = line_range
+        self.total_time = sum(x.total_time for x in line_range)
+
 class ClanBlock(object):
 
     get_user_comments = filters.user_comments
+    get_tiers = filters.tier
 
     def __init__(self, block_index, line_map):
         self.index = block_index
@@ -46,6 +58,17 @@ class ClanBlock(object):
                 break
 
         self.length = self.offset - self.onset
+        self.total_time = sum(x.total_time for x in line_map)
+
+class BlockGroup(object):
+
+    get_user_comments = filters.user_comments
+    get_tiers = filters.tier
+
+    def __init__(self, blocks):
+        self.blocks = blocks
+        self.line_map = [element for block in blocks for element in block.line_map]
+        self.total_time = sum(x.length for x in blocks)
 
 
 interval_regx = re.compile("\\x15\d+_\d+\\x15")

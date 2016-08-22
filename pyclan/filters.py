@@ -31,7 +31,7 @@ def conv_blocks(self, begin=0, end=None, select=None):
                     current_block = []
                     current_block.append(line)
                     current_block_num = line.conv_block_num
-        return blocks
+        return BlockGroup(blocks)
 
     if begin and end:
         current_block_num = begin
@@ -48,7 +48,7 @@ def conv_blocks(self, begin=0, end=None, select=None):
                     current_block = []
                     current_block.append(line)
                     current_block_num = line.conv_block_num
-        return blocks
+        return BlockGroup(blocks)
 
 def tier(self, *tiers):
     results = []
@@ -91,7 +91,7 @@ def time(self, begin=None, end=None):
             if region_started and not region_ended:
                 results.append(line)
 
-    return results
+    return LineRange(results)
 
 def get_with_keyword(self, keyword):
     line_map = OrderedDict()

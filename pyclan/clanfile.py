@@ -35,7 +35,6 @@ class ClanFile(object):
 
             last_line = None
             for index, line in enumerate(input):
-
                 clan_line = ClanLine(index, line)
 
                 if line.startswith("@") or index < 10:
@@ -86,7 +85,7 @@ class ClanFile(object):
                     if line.count("|") > 3:
                         clan_line.clan_comment = True
                     else:
-                        clan_line.user_comment = True
+                        clan_line.is_user_comment = True
                     clan_line.content = line.split("\t")[1]
 
                     if conv_block_started:
@@ -117,6 +116,7 @@ class ClanFile(object):
                     offset = int(timestamp.split("_")[1].replace("\x15", ""))
                     clan_line.time_onset = onset
                     clan_line.time_offset = offset
+                    clan_line.total_time = offset - onset
                     if conv_block_started:
                         clan_line.conv_block_num = current_conv_block
                         clan_line.within_conv_block = True

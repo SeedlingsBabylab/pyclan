@@ -51,6 +51,31 @@ less_than_123456 = clan_file.get_within_time(end=123456)
 
 
 
+
+
+# Most functions for filtering a whole ClanFile are available to
+# use on smaller subunits of the file, like a single block, a
+# group of blocks, or an arbitrary time range.
+# For example (using previously returned values):
+
+# get user comments in block 33
+comments_in_block_33 = block_33.get_user_comments()
+
+# get user comments from group of blocks that were returned:
+comments_in_block_group = blocks_7_through_33.get_user_comments()
+
+# get all CHN, OLN, and NOF tiered lines from block 33.
+CHN_OLN_and_NOF_in_block_33 = block_33.get_tiers("CHN", "OLN", "NOF")
+
+# get all CHN, OLN, and NOF tiered lines in time range
+CHN_OLN_and_NOF_in_time_range = between_123456_and_1234567.get_tiers("CHN", "OLN", "NOF")
+
+
+
+
+
+
+
 # There are some helpful functions for editing the CLAN file.
 
 # You can find all the lines which contain a given keyword:

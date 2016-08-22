@@ -22,7 +22,7 @@ if __name__ == "__main__":
 
     all_CHN_tiers = clan_file.get_tiers("CHN")
 
-    between_11378_and_59023 = clan_file.get_within_time(begin=11378, end=59023)
+    between_123456_and_1234567 = clan_file.get_within_time(begin=123456, end=1234567)
 
     greater_than_123456 = clan_file.get_within_time(begin=123456)
 
@@ -37,6 +37,10 @@ if __name__ == "__main__":
     #clan_file.set_content_from_new_map(new_editted_line_map)
 
     clan_file.write_to_cha("31_14_new.cha")
+
+    comments_in_block_group = blocks_5_19_12_and_45.get_user_comments()
+
+    CHN_OLN_and_NOF_in_line_range = between_123456_and_1234567.get_tiers("CHN", "OLN", "NOF")
 
     print
 
