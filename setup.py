@@ -9,5 +9,5 @@ setup(name='pyclan',
       author_email='andrei.amatuni@gmail.com',
       license="MIT",
       url='https://github.com/SeedlingsBabylab/pyclan',
-      packages=['distutils', 'distutils.command'],
+      packages=["pyclan"]
 )

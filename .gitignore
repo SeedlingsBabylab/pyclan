@@ -1,3 +1,6 @@
 sample_data
 .idea
 *.pyc
+*.cha
+dist
+MANIFEST

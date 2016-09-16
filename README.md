@@ -2,14 +2,14 @@
 
 This is a Python library for working with CHAT (.cha) files that are used by the CLAN audio annotation program.
 
-More info about CLAN [here](http://childes.psy.cmu.edu/clan/)
+More info about CLAN: [here](http://childes.psy.cmu.edu/clan/)
 
+Note: the parser doesn't comply with the entire CHAT file specification. It implements a subset of the specification (enough to parse the SEEDLings corpus).
 
 
 ## usage examples:
 
 ```python
-
 import pyclan
 
 
@@ -51,8 +51,6 @@ less_than_123456 = clan_file.get_within_time(end=123456)
 
 
 
-
-
 # Most functions for filtering a whole ClanFile are available to
 # use on smaller subunits of the file, like a single block, a
 # group of blocks, or an arbitrary time range.
@@ -69,9 +67,6 @@ chn_oln_and_nof_in_block_33 = block_33.get_tiers("CHN", "OLN", "NOF")
 
 # get all CHN, OLN, and NOF tiered lines in time range
 chn_oln_and_nof_in_time_range = between_123456_and_1234567.get_tiers("CHN", "OLN", "NOF")
-
-
-
 
 
 
@@ -95,6 +90,14 @@ clan_file.replace_with_keyword(lines_with_keywords, "apple", "blueberry")
 # You can then save those edits you made by calling the
 # write_to_cha() method on the clan_file object
 clan_file.write_to_cha("/path/to/new/cha/file_with_edits.cha")
+
+
+
+# You can output new CLAN files with specified subportions of the original
+# file. For example, here's a new CLAN file with only blocks 7, 45, 111, and 178:
+clan_file.new_file_from_blocks("/path/to/new/file.cha", [7, 45, 111, 178])
+
+
 
 
 ```

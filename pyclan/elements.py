@@ -1,13 +1,18 @@
 import re
-import itertools
 
 import filters
 
 class ClanLine(object):
+    """
+    ClanLine is the smallest unit of subdivision of
+    a CLAN file. every single line in a CLAN file is
+    represented by one of these objects
+    """
     def __init__(self, index, line):
         self.index = index
         self.line = line
         self.is_header = False
+        self.is_end_header = False
         self.is_conv_block_delimiter = False
         self.is_paus_block_delimiter = False
         self.is_tier_line = False
@@ -34,15 +39,30 @@ class LineRange(object):
 
     get_user_comments = filters.user_comments
     get_tiers = filters.tier
+    filter_out_tiers = filters.filter_out_tier
 
     def __init__(self, line_range):
         self.line_map = line_range
         self.total_time = sum(x.total_time for x in line_range)
 
 class ClanBlock(object):
+    """
+    A Block refers to a range of lines in between tags labeled:
 
+    @Bg Conversation XYZ
+    blah
+    blah
+    blah
+    @Eg Conversation XYZ
+
+    Where XYZ is the number of the block.
+
+    The block will include those @Bg and @Eg tags along with it
+
+    """
     get_user_comments = filters.user_comments
     get_tiers = filters.tier
+    filter_out_tiers = filters.filter_out_tier
 
     def __init__(self, block_index, line_map):
         self.index = block_index
@@ -64,6 +84,7 @@ class BlockGroup(object):
 
     get_user_comments = filters.user_comments
     get_tiers = filters.tier
+    filter_out_tiers = filters.filter_out_tier
 
     def __init__(self, blocks):
         self.blocks = blocks
@@ -75,3 +96,4 @@ interval_regx = re.compile("\\x15\d+_\d+\\x15")
 block_regx = re.compile("Conversation (\d+)")
 pause_regx = re.compile("Pause (\d+)")
 xdb_regx = re.compile("average_dB=\"([-+]?[0-9]*\.?[0-9]+)\" peak_dB=\"([-+]?[0-9]*\.?[0-9]+)\"")
+
