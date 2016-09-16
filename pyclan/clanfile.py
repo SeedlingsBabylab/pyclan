@@ -155,7 +155,8 @@ class ClanFile(object):
             for line in self.line_map:
                 output.write(line.line)
 
-    def new_file_from_blocks(self, path, blocks, rewrite_timestamps=False):
+    def new_file_from_blocks(self, path, blocks=[], rewrite_timestamps=False,
+                             begin=1, end=None):
         """
         This produces a new cha file with only the blocks specified
 
@@ -170,7 +171,10 @@ class ClanFile(object):
 
         with open(path, "wb") as output:
             header = self.get_header()
-            blocks = self.get_conv_blocks(select=blocks)
+            if blocks:
+                blocks = self.get_conv_blocks(select=blocks)
+            else:
+                blocks = self.get_conv_blocks(begin=begin, end=end)
 
             for line in header:
                 if not line.is_end_header:

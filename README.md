@@ -97,6 +97,8 @@ clan_file.write_to_cha("/path/to/new/cha/file_with_edits.cha")
 # file. For example, here's a new CLAN file with only blocks 7, 45, 111, and 178:
 clan_file.new_file_from_blocks("/path/to/new/file.cha", [7, 45, 111, 178])
 
+# Same idea, except with a range of blocks, e.g. blocks 4 through 112
+clan_file.new_file_from_blocks("/path/to/new/file.cha", begin=4, end=112)
 
 
 
