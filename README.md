@@ -7,6 +7,15 @@ More info about CLAN: [here](http://childes.psy.cmu.edu/clan/)
 Note: the parser doesn't comply with the entire CHAT file specification. It implements a subset of the specification (enough to parse the SEEDLings corpus).
 
 
+## install
+
+clone this repo, then inside the main folder, run:
+
+```
+$: python setup.py install
+```
+
+
 ## usage examples:
 
 ```python

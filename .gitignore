@@ -4,3 +4,4 @@ sample_data
 *.cha
 dist
 MANIFEST
+build

@@ -1,4 +1,3 @@
-
 def user_comments(self):
     return [line for line in self.line_map if line.is_user_comment]
 
@@ -21,7 +20,6 @@ def conv_blocks(self, begin=1, end=None, select=None):
                 (result will be sorted in ascending order)
 
     Returns: a BlockGroup of specified conversation blocks
-
     """
     blocks = []
 
@@ -57,7 +55,6 @@ def tier(self, *tiers):
         *tiers: a list of tiers, e.g. ["MAN", "FAN", "CHN
 
     Returns: LineRange with all the lines
-
     """
     results = []
     for line in self.line_map:
@@ -89,7 +86,6 @@ def filter_out_tier(self, *tiers):
 
     Will delete all the "MAN" and "CHN" tiered lines from the object
     representing block 33.
-
     """
     results = []
     for index, line in enumerate(self.line_map):
@@ -148,13 +144,11 @@ def time(self, begin=None, end=None):
 
 def get_with_keyword(self, keyword):
     """
-
     Args:
         self:
-        keyword:
+        keyword: some string to search for
 
     Returns:
-
     """
     line_map = []
 

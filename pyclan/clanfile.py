@@ -83,8 +83,12 @@ class ClanFile(object):
                     if last_line.is_user_comment or last_line.is_tier_line:
                         last_line.is_multi_parent = True
                         clan_line.multi_line_parent = last_line
+                        if last_line.is_tier_line:
+                            clan_line.is_tier_line = True
                     else:
                         clan_line.multi_line_parent = last_line.multi_line_parent
+                        if clan_line.multi_line_parent.is_tier_line:
+                            clan_line.is_tier_line = True
 
                 if line.startswith("%com:") or line.startswith("%xcom:"):
                     if line.count("|") > 3:

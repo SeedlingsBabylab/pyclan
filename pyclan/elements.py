@@ -32,8 +32,13 @@ class ClanLine(object):
         self.xdb_average = 0
         self.xdb_peak = 0
 
+    def __repr__(self):
+        return self.line
+
     def timestamp(self):
          return "{}_{}".format(self.time_onset, self.time_offset)
+
+
 
 class LineRange(object):
 
@@ -44,6 +49,9 @@ class LineRange(object):
     def __init__(self, line_range):
         self.line_map = line_range
         self.total_time = sum(x.total_time for x in line_range)
+
+    def __len__(self):
+        return len(self.line_map)
 
 class ClanBlock(object):
     """
@@ -67,6 +75,7 @@ class ClanBlock(object):
     def __init__(self, block_index, line_map):
         self.index = block_index
         self.line_map = line_map
+        self.num_tier_lines = 0
 
         for line in self.line_map:
             if line.time_onset != 0:
@@ -77,10 +86,22 @@ class ClanBlock(object):
                 self.offset = line.time_offset
                 break
 
+        for line in self.line_map:
+            if line.is_tier_line:
+                self.num_tier_lines += 1
+
         self.length = self.offset - self.onset
         self.total_time = sum(x.total_time for x in line_map)
 
 class BlockGroup(object):
+    """
+    BlockGroup is a collection of ClanBlocks.
+
+    the range of all their lines are represented in
+     BlockGroup's self.line_map. If these are not contiguous
+     blocks then the lines will not be contiguous (in time), but they're
+     all there in a single list
+    """
 
     get_user_comments = filters.user_comments
     get_tiers = filters.tier
