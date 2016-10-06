@@ -5,3 +5,4 @@ sample_data
 dist
 MANIFEST
 build
+.ipynb_checkpoints

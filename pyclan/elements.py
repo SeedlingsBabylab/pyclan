@@ -16,6 +16,7 @@ class ClanLine(object):
         self.is_conv_block_delimiter = False
         self.is_paus_block_delimiter = False
         self.is_tier_line = False
+        self.is_tier_without_timestamp = False
         self.multi_line_parent = None
         self.is_multi_parent = False
         self.time_onset = 0
@@ -52,6 +53,9 @@ class LineRange(object):
 
     def __len__(self):
         return len(self.line_map)
+
+    # def __contains__(self, key):
+    #
 
 class ClanBlock(object):
     """

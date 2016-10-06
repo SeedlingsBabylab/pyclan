@@ -22,7 +22,9 @@ class ClanFile(object):
     def __init__(self, path):
         self.clan_path = path
         self.filename = os.path.basename(self.clan_path)
-        self.num_blocks = 0
+        self.num_full_blocks = 0
+        self.full_block_range = False
+        self.block_index = [] # list of all the full block indices in this file
         self.line_map = self.parse_file()
 
     def parse_file(self):
@@ -33,14 +35,21 @@ class ClanFile(object):
             
             conv_block_started = False
             conv_block_ended = False
+
+            last_conv_block_type = ""
+            last_conv_block_num = 0
+            # no_conv_block_start = False
+            # no_conv_block_end = False
+
             paus_block_started = False
             paus_block_ended = False
 
             last_line = None
             for index, line in enumerate(input):
                 clan_line = elements.ClanLine(index, line)
+                #print line
 
-                if line.startswith("@") or index < 10:
+                if line.startswith("@") or index < 11:
                     block_delimiter = False
                     if line.startswith("@Bg") or line.startswith("@Eg"):
                         conv_block_regx_result = elements.block_regx.search(line)
@@ -49,9 +58,16 @@ class ClanFile(object):
                             current_conv_block = int(conv_block_regx_result.group(1))
                             block_delimiter = True
                             if "@Bg" in line:
+                                last_conv_block_type = "@Bg"
+                                last_conv_block_num = current_conv_block
                                 conv_block_started = True
                                 conv_block_ended = False
                             if "@Eg" in line:
+                                if last_conv_block_type == "@Bg" and last_conv_block_num == current_conv_block:
+                                        self.num_full_blocks += 1
+                                        self.block_index.append(current_conv_block)
+                                last_conv_block_type = "@Eg"
+                                last_conv_block_num = current_conv_block
                                 conv_block_started = False
                                 conv_block_ended = True
                                 clan_line.is_conv_block_delimiter = True
@@ -85,10 +101,12 @@ class ClanFile(object):
                         clan_line.multi_line_parent = last_line
                         if last_line.is_tier_line:
                             clan_line.is_tier_line = True
+                            clan_line.tier = clan_line.multi_line_parent.tier
                     else:
                         clan_line.multi_line_parent = last_line.multi_line_parent
                         if clan_line.multi_line_parent.is_tier_line:
                             clan_line.is_tier_line = True
+                            clan_line.tier = clan_line.multi_line_parent.tier
 
                 if line.startswith("%com:") or line.startswith("%xcom:"):
                     if line.count("|") > 3:
@@ -116,7 +134,6 @@ class ClanFile(object):
                     else:
                         clan_line.conv_block_num = 0
 
-
                 interv_regx_result = elements.interval_regx.search(line)
 
                 if interv_regx_result:
@@ -126,6 +143,14 @@ class ClanFile(object):
                     clan_line.time_onset = onset
                     clan_line.time_offset = offset
                     clan_line.total_time = offset - onset
+
+                    # there's no timestamp on a tier line
+                    # (it wraps around to the next line)
+                    if last_line.is_tier_without_timestamp:
+                        last_line.time_onset = onset
+                        last_line.time_offset = offset
+                        last_line.total_time = offset - onset
+
                     if conv_block_started:
                         clan_line.conv_block_num = current_conv_block
                         clan_line.within_conv_block = True
@@ -135,10 +160,18 @@ class ClanFile(object):
                         clan_line.tier = line[1:4]
                         clan_line.content = line.split("\t")[1].replace(timestamp+"\n", "")
                         clan_line.is_tier_line = True
+
+                else:
+                    if line.startswith("*"):
+                        clan_line.tier = line[1:4]
+                        clan_line.content = line.split("\t")[1].replace("\n", "")
+                        clan_line.is_tier_line = True
+                        clan_line.is_tier_without_timestamp = True
+
                 line_map.append(clan_line)
                 last_line = clan_line
 
-        self.num_blocks = current_conv_block
+        # self.num_blocks = current_conv_block
         return line_map
 
     def block_map(self):
