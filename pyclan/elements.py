@@ -82,11 +82,11 @@ class ClanBlock(object):
         self.num_tier_lines = 0
 
         for line in self.line_map:
-            if line.time_onset != 0:
+            if line.is_tier_line:
                 self.onset = line.time_onset
                 break
         for line in reversed(self.line_map):
-            if line.time_offset != 0:
+            if line.is_tier_line:
                 self.offset = line.time_offset
                 break
 
