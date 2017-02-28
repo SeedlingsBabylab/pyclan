@@ -114,6 +114,8 @@ class ClanFile(object):
                     else:
                         clan_line.is_user_comment = True
                     clan_line.content = line.split("\t")[1]
+                    clan_line.time_onset = last_line.time_onset
+                    clan_line.time_offset = last_line.time_offset
 
                     if conv_block_started:
                         clan_line.conv_block_num = current_conv_block

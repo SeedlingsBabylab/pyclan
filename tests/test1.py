@@ -41,6 +41,6 @@ if __name__ == "__main__":
 
     filtered_blocks_5_19_12_and_45 = blocks_5_19_12_and_45.filter_out_tiers("MAN")
 
-
+    print "{} --- {}".format(variablename, value)
     print
 
