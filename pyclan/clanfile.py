@@ -26,6 +26,7 @@ class ClanFile(object):
         self.full_block_range = False
         self.block_index = [] # list of all the full block indices in this file
         self.line_map = self.parse_file()
+        self.total_time = sum(line.total_time for line in self.line_map if line.is_tier_line)
 
     def parse_file(self):
         line_map = []
