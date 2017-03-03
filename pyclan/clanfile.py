@@ -114,6 +114,7 @@ class ClanFile(object):
                         clan_line.clan_comment = True
                     else:
                         clan_line.is_user_comment = True
+                    print line
                     clan_line.content = line.split("\t")[1]
                     clan_line.time_onset = last_line.time_onset
                     clan_line.time_offset = last_line.time_offset
