@@ -49,7 +49,14 @@ class ClanFile(object):
             for index, line in enumerate(input):
                 clan_line = elements.ClanLine(index, line)
                 #print line
-
+                if last_line:
+                    clan_line.time_onset = last_line.time_onset
+                    clan_line.time_offset = last_line.time_offset
+                else:
+                    clan_line.time_onset = 0
+                    clan_line.time_offset = 0
+                if clan_line.time_onset is None and index > 20:
+                    print
                 if line.startswith("@") or index < 11:
                     block_delimiter = False
                     if line.startswith("@Bg") or line.startswith("@Eg"):
@@ -63,6 +70,7 @@ class ClanFile(object):
                                 last_conv_block_num = current_conv_block
                                 conv_block_started = True
                                 conv_block_ended = False
+
                             if "@Eg" in line:
                                 if last_conv_block_type == "@Bg" and last_conv_block_num == current_conv_block:
                                         self.num_full_blocks += 1
@@ -76,6 +84,12 @@ class ClanFile(object):
                                 clan_line.within_conv_block = True
                                 line_map.append(clan_line)
                                 last_line = clan_line
+                                if last_line:
+                                    clan_line.time_onset = last_line.time_onset
+                                    clan_line.time_offset = last_line.time_offset
+                                else:
+                                    clan_line.time_onset = 0
+                                    clan_line.time_offset = 0
                                 continue
                         clan_line.is_conv_block_delimiter = block_delimiter
                         if conv_block_started:
@@ -90,8 +104,7 @@ class ClanFile(object):
                     clan_line.is_header = True
                     if "@End" in line:
                         clan_line.is_end_header = True
-                    clan_line.time_onset = None
-                    clan_line.time_offset = None
+
                     line_map.append(clan_line)
                     last_line = clan_line
                     continue
@@ -114,10 +127,8 @@ class ClanFile(object):
                         clan_line.clan_comment = True
                     else:
                         clan_line.is_user_comment = True
-                    print line
+                    # print line
                     clan_line.content = line.split("\t")[1]
-                    clan_line.time_onset = last_line.time_onset
-                    clan_line.time_offset = last_line.time_offset
 
                     if conv_block_started:
                         clan_line.conv_block_num = current_conv_block
