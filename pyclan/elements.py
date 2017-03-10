@@ -27,6 +27,7 @@ class ClanLine(object):
         self.within_paus_block = False
         self.is_clan_comment = False
         self.is_user_comment = False
+        self.is_other_comment = False
         self.xdb_line = False
         self.tier = None
         self.content = None

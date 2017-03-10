@@ -48,7 +48,7 @@ class ClanFile(object):
             last_line = None
             for index, line in enumerate(input):
                 clan_line = elements.ClanLine(index, line)
-                #print line
+                # print line
                 if last_line:
                     clan_line.time_onset = last_line.time_onset
                     clan_line.time_offset = last_line.time_offset
@@ -110,7 +110,7 @@ class ClanFile(object):
                     continue
 
                 if line.startswith("\t"):
-                    if last_line.is_user_comment or last_line.is_tier_line:
+                    if last_line.is_user_comment or last_line.is_tier_line or last_line.is_other_comment:
                         last_line.is_multi_parent = True
                         clan_line.multi_line_parent = last_line
                         if last_line.is_tier_line:
@@ -122,32 +122,38 @@ class ClanFile(object):
                             clan_line.is_tier_line = True
                             clan_line.tier = clan_line.multi_line_parent.tier
 
-                if line.startswith("%com:") or line.startswith("%xcom:"):
-                    if line.count("|") > 3:
-                        clan_line.clan_comment = True
-                    else:
-                        clan_line.is_user_comment = True
-                    # print line
+
+                if line.startswith("%"):
                     clan_line.content = line.split("\t")[1]
 
-                    if conv_block_started:
-                        clan_line.conv_block_num = current_conv_block
-                        clan_line.within_conv_block = True
-                    else:
-                        clan_line.conv_block_num = 0
+                    if line.startswith("%com:") or line.startswith("%xcom:"):
+                        if line.count("|") > 3:
+                            clan_line.clan_comment = True
+                        else:
+                            clan_line.is_user_comment = True
+                        # print line
+                        # clan_line.content = line.split("\t")[1]
 
-                if line.startswith("%xdb:"):
-                    clan_line.xdb_line = True
-                    xdb_regx_result = elements.xdb_regx.search(line)
-                    if xdb_regx_result:
-                        clan_line.xdb_average = xdb_regx_result.group(1)
-                        clan_line.xdb_peak = xdb_regx_result.group(2)
+                        if conv_block_started:
+                            clan_line.conv_block_num = current_conv_block
+                            clan_line.within_conv_block = True
+                        else:
+                            clan_line.conv_block_num = 0
 
-                    if conv_block_started:
-                        clan_line.conv_block_num = current_conv_block
-                        clan_line.within_conv_block = True
+                    elif line.startswith("%xdb:"):
+                        clan_line.xdb_line = True
+                        xdb_regx_result = elements.xdb_regx.search(line)
+                        if xdb_regx_result:
+                            clan_line.xdb_average = xdb_regx_result.group(1)
+                            clan_line.xdb_peak = xdb_regx_result.group(2)
+
+                        if conv_block_started:
+                            clan_line.conv_block_num = current_conv_block
+                            clan_line.within_conv_block = True
+                        else:
+                            clan_line.conv_block_num = 0
                     else:
-                        clan_line.conv_block_num = 0
+                        clan_line.is_other_comment = True
 
                 interv_regx_result = elements.interval_regx.search(line)
 
