@@ -10,12 +10,11 @@ class ClanFile(object):
     get_user_comments = filters.user_comments
     get_conv_block = filters.conv_block
     get_conv_blocks = filters.conv_blocks
-    # get_paus_block = filters.paus_block
-    # get_paus_blocks = filters.paus_blocks
     get_tiers = filters.tier
     get_within_time = filters.time
     get_with_keyword = filters.get_with_keyword
     replace_with_keyword = filters.replace_with_keyword
+    replace_comments = filters.replace_comment
 
     end_tag = "@End"
 

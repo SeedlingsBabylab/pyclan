@@ -163,7 +163,30 @@ def replace_with_keyword(self, line_range, orig_key, new_key):
     for line in line_range.line_map:
         if orig_key in line.content:
             line.content = line.content.replace(orig_key, new_key)
-            line.line  = line.line.replace(orig_key, new_key)
+            line.line = line.line.replace(orig_key, new_key)
+
+
+def replace_comment(self, orig_keywords=[], new_comment=""):
+    """
+    Replace the comment lines containing any of the keywords in a given
+    list, with a new string. This will only handle original comments
+    which span a single line
+
+    Args:
+        self:
+        orig_keywords: keywords to look for in replaced comments
+        new_comment: the content of the comment which replaces
+
+    Returns:
+
+    """
+    new_linemap = []
+    for line in self.line_map:
+        if line.is_user_comment and any(x in line.line for x in orig_keywords):
+            line.line = "%xcom:\t{}\n".format(new_comment)
+        new_linemap.append(line)
+
+
 
 from elements import *
 from clanfile import *
