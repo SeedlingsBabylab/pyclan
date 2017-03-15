@@ -29,10 +29,10 @@ class ClanFile(object):
 
     def parse_file(self):
         line_map = []
-        with open(self.clan_path, "rU") as input:
+        with open(self.clan_path, "r") as input:
             current_conv_block = 0
             current_paus_block = 0
-            
+
             conv_block_started = False
             conv_block_ended = False
 
@@ -241,4 +241,3 @@ class ClanFile(object):
                 output.write(line.line)
 
             output.write(self.end_tag)
-

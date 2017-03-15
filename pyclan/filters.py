@@ -183,7 +183,8 @@ def replace_comment(self, orig_keywords=[], new_comment=""):
     new_linemap = []
     for line in self.line_map:
         if line.is_user_comment and any(x in line.line for x in orig_keywords):
-            line.line = "%xcom:\t{}\n".format(new_comment)
+            line.line = "%xcom:\t{}{}".format(new_comment,
+                                              line.line[line.line.find("\n"):])
         new_linemap.append(line)
 
 
