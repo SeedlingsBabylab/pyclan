@@ -1,3 +1,7 @@
+import re
+
+code_regx = re.compile('(&=)(.)(_)(.)(_)([a-zA-Z0-9]{3})', re.IGNORECASE|re.DOTALL)
+
 def user_comments(self):
     return [line for line in self.line_map if line.is_user_comment]
 
@@ -186,6 +190,19 @@ def replace_comment(self, orig_keywords=[], new_comment=""):
             line.line = "%xcom:\t{}{}".format(new_comment,
                                               line.line[line.line.find("\n"):])
         new_linemap.append(line)
+
+
+
+def get_with_speaker(self, speaker):
+    line_map = []
+    for line in self.line_map:
+        if line.is_tier_line:
+            matches = code_regx.findall(line.content)
+            if matches:
+                for m in matches:
+                    if m[5] == speaker:
+                        line_map.append(line)
+    return line_map
 
 
 

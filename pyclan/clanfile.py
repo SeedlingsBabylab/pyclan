@@ -13,6 +13,7 @@ class ClanFile(object):
     get_tiers = filters.tier
     get_within_time = filters.time
     get_with_keyword = filters.get_with_keyword
+    get_with_speaker = filters.get_with_speaker
     replace_with_keyword = filters.replace_with_keyword
     replace_comments = filters.replace_comment
 
@@ -45,8 +46,11 @@ class ClanFile(object):
             paus_block_ended = False
 
             last_line = None
+            seen_tier = False
             for index, line in enumerate(input):
                 clan_line = elements.ClanLine(index, line)
+                if line.startswith("*"):
+                    seen_tier = True
                 # print line
                 if last_line:
                     clan_line.time_onset = last_line.time_onset
@@ -56,7 +60,7 @@ class ClanFile(object):
                     clan_line.time_offset = 0
                 if clan_line.time_onset is None and index > 20:
                     print
-                if line.startswith("@") or index < 11:
+                if (line.startswith("@") or index < 11) and not seen_tier:
                     block_delimiter = False
                     if line.startswith("@Bg") or line.startswith("@Eg"):
                         conv_block_regx_result = elements.block_regx.search(line)
@@ -180,7 +184,10 @@ class ClanFile(object):
                         clan_line.tier = line[1:4]
                         clan_line.content = line.split("\t")[1].replace(timestamp+"\n", "")
                         clan_line.is_tier_line = True
-
+                    if line.startswith("\t"):
+                        clan_line.tier = line[1:4]
+                        clan_line.content = line.split("\t")[1].replace(timestamp+"\n", "")
+                        clan_line.is_tier_line = True
                 else:
                     if line.startswith("*"):
                         clan_line.tier = line[1:4]
@@ -193,6 +200,24 @@ class ClanFile(object):
 
         # self.num_blocks = current_conv_block
         return line_map
+
+    def insert_line(self, line, index):
+        """
+        Insert a ClanLine into the middle of a ClanFile at
+        a given index.
+
+        If index == 15, then the current ClanLine at 15 will
+        be pushed to 16, and the new ClanLine will take its
+        place.
+
+        Args:
+            line: ClanLine object to insert into the ClanFile
+            index: index to insert at
+        """
+        self.line_map.insert(index, line)
+        for i, x in enumerate(self.line_map):
+            x.index = i
+
 
     def block_map(self):
         return True

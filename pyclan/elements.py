@@ -10,6 +10,8 @@ class ClanLine(object):
     """
     def __init__(self, index, line):
         self.index = index
+        if line[-1] != "\n":
+            line += "\n"
         self.line = line
         self.is_header = False
         self.is_end_header = False
