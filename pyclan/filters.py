@@ -209,6 +209,11 @@ def get_with_speaker(self, speaker):
                         line_map.append(line)
     return line_map
 
+def get_with_time(self, onset, offset):
+    results = []
+    for line in self.line_map:
+        if line.time_onset == onset and line.time_offset == offset:
+            results.append(line)
 
 
 from elements import *

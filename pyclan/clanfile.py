@@ -13,6 +13,7 @@ class ClanFile(object):
     get_within_time = filters.time
     get_with_keyword = filters.get_with_keyword
     get_with_speaker = filters.get_with_speaker
+    get_with_time = filters.get_with_time
     replace_with_keyword = filters.replace_with_keyword
     replace_comments = filters.replace_comment
 
@@ -201,6 +202,8 @@ class ClanFile(object):
                         annot = elements.Annotation(word, utt_type, present, speaker,
                                                     onset = clan_line.time_onset,
                                                     offset = clan_line.time_offset)
+                        annot.line_num = clan_line.index
+                        annot.orig_string = ''.join(code)
 
                         clan_line.annotations.append(annot)
 
@@ -228,9 +231,14 @@ class ClanFile(object):
             x.index = i
 
     def annotations(self):
-
         annots = [x for line in self.line_map for x in line.annotations]
         return annots
+
+    def clear_annotations(self):
+        for line in self.line_map:
+            if line.annotations:
+                for annot in line.annotations:
+                    line.line = line.line.replace(annot.orig_string, "")
 
     def block_map(self):
         return True

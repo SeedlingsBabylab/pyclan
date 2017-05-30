@@ -128,13 +128,16 @@ class Annotation(object):
     Annotation is a class to encapsulate all our object word
     annotations and the metadata associated with them.
     """
-    def __init__(self, word, utt_type, present, speaker, onset=0, offset=0):
+    def __init__(self, word, utt_type, present,
+                       speaker, onset=0, offset=0):
         self.word = word
         self.utt_type = utt_type
         self.present = present
         self.speaker = speaker
         self.onset = onset
         self.offset = offset
+        self.orig_string = ""
+        self.line_num = 0
 
     def __repr__(self):
         return "{} &={}_{}_{}".format(self.word, self.utt_type,
