@@ -36,6 +36,8 @@ class ClanLine(object):
         self.xdb_average = 0
         self.xdb_peak = 0
 
+        self.annotations = []
+
     def __repr__(self):
         return self.line
 
@@ -120,8 +122,29 @@ class BlockGroup(object):
         self.total_time = sum(x.length for x in blocks)
 
 
+
+class Annotation(object):
+    """
+    Annotation is a class to encapsulate all our object word
+    annotations and the metadata associated with them.
+    """
+    def __init__(self, word, utt_type, present, speaker, onset=0, offset=0):
+        self.word = word
+        self.utt_type = utt_type
+        self.present = present
+        self.speaker = speaker
+        self.onset = onset
+        self.offset = offset
+
+    def __repr__(self):
+        return "{} &={}_{}_{}".format(self.word, self.utt_type,
+                                      self.present, self.speaker)
+
+
+
 interval_regx = re.compile("\\x15\d+_\d+\\x15")
 block_regx = re.compile("Conversation (\d+)")
 pause_regx = re.compile("Pause (\d+)")
 xdb_regx = re.compile("average_dB=\"([-+]?[0-9]*\.?[0-9]+)\" peak_dB=\"([-+]?[0-9]*\.?[0-9]+)\"")
-
+code_regx = re.compile('([a-zA-Z+]+)( +)(&=)(.)(_)(.)(_)([a-zA-Z0-9]{3})', re.IGNORECASE|re.DOTALL)
+# annot_regx = re.compile('(&=)(.)(_)(.)(_)([a-zA-Z0-9]{3})')

@@ -1,9 +1,9 @@
 import re
 
-code_regx = re.compile('(&=)(.)(_)(.)(_)([a-zA-Z0-9]{3})', re.IGNORECASE|re.DOTALL)
 
 def user_comments(self):
     return [line for line in self.line_map if line.is_user_comment]
+
 
 def conv_block(self, block_num):
     line_map = []
@@ -12,6 +12,7 @@ def conv_block(self, block_num):
             line_map.append(line)
 
     return ClanBlock(block_num, line_map)
+
 
 def conv_blocks(self, begin=1, end=None, select=None):
     """ Get specified conversation blocks
@@ -69,6 +70,7 @@ def tier(self, *tiers):
             results.append(line)
     return LineRange(results)
 
+
 def filter_out_tier(self, *tiers):
     """ Remove all lines with specified tiers
 
@@ -97,6 +99,7 @@ def filter_out_tier(self, *tiers):
             results.append(line)
             del self.line_map[index]
     return LineRange(results)
+
 
 def time(self, begin=None, end=None):
     """ Get all lines within a time range
@@ -146,6 +149,7 @@ def time(self, begin=None, end=None):
 
     return LineRange(results)
 
+
 def get_with_keyword(self, keyword):
     """
     Args:
@@ -163,11 +167,13 @@ def get_with_keyword(self, keyword):
 
     return LineRange(line_map)
 
+
 def replace_with_keyword(self, line_range, orig_key, new_key):
     for line in line_range.line_map:
         if orig_key in line.content:
             line.content = line.content.replace(orig_key, new_key)
             line.line = line.line.replace(orig_key, new_key)
+
 
 
 def replace_comment(self, orig_keywords=[], new_comment=""):
@@ -192,7 +198,6 @@ def replace_comment(self, orig_keywords=[], new_comment=""):
         new_linemap.append(line)
 
 
-
 def get_with_speaker(self, speaker):
     line_map = []
     for line in self.line_map:
@@ -200,7 +205,7 @@ def get_with_speaker(self, speaker):
             matches = code_regx.findall(line.content)
             if matches:
                 for m in matches:
-                    if m[5] == speaker:
+                    if m[7] == speaker:
                         line_map.append(line)
     return line_map
 

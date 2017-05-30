@@ -1,4 +1,3 @@
-
 import csv
 import os
 
@@ -39,8 +38,6 @@ class ClanFile(object):
 
             last_conv_block_type = ""
             last_conv_block_num = 0
-            # no_conv_block_start = False
-            # no_conv_block_end = False
 
             paus_block_started = False
             paus_block_ended = False
@@ -51,7 +48,6 @@ class ClanFile(object):
                 clan_line = elements.ClanLine(index, line)
                 if line.startswith("*"):
                     seen_tier = True
-                # print line
                 if last_line:
                     clan_line.time_onset = last_line.time_onset
                     clan_line.time_offset = last_line.time_offset
@@ -195,6 +191,19 @@ class ClanFile(object):
                         clan_line.is_tier_line = True
                         clan_line.is_tier_without_timestamp = True
 
+                codes = elements.code_regx.findall(line)
+                if codes:
+                    for code in codes:
+                        word = code[0]
+                        utt_type = code[3]
+                        present = code[5]
+                        speaker = code[7]
+                        annot = elements.Annotation(word, utt_type, present, speaker,
+                                                    onset = clan_line.time_onset,
+                                                    offset = clan_line.time_offset)
+
+                        clan_line.annotations.append(annot)
+
                 line_map.append(clan_line)
                 last_line = clan_line
 
@@ -218,6 +227,10 @@ class ClanFile(object):
         for i, x in enumerate(self.line_map):
             x.index = i
 
+    def annotations(self):
+
+        annots = [x for line in self.line_map for x in line.annotations]
+        return annots
 
     def block_map(self):
         return True
