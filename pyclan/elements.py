@@ -143,6 +143,15 @@ class Annotation(object):
         return "{} &={}_{}_{}".format(self.word, self.utt_type,
                                       self.present, self.speaker)
 
+    def annot_string(self, word=True, utt_type=True, present=True, speaker=True):
+
+        w = self.word if word else "XXXX"
+        u = self.utt_type if utt_type else "X"
+        p = self.present if present else "X"
+        s = self.speaker if speaker else "X"
+
+        return "{} &={}_{}_{}".format(w, u, p, s)
+
 
 
 interval_regx = re.compile("\\x15\d+_\d+\\x15")
