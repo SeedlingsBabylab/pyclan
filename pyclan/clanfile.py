@@ -16,6 +16,7 @@ class ClanFile(object):
     get_with_time = filters.get_with_time
     replace_with_keyword = filters.replace_with_keyword
     replace_comments = filters.replace_comment
+    shift_timestamps = filters.shift_timestamps
 
     end_tag = "@End"
 
@@ -196,6 +197,7 @@ class ClanFile(object):
                 if codes:
                     for code in codes:
                         word = code[0]
+
                         utt_type = code[3]
                         present = code[5]
                         speaker = code[7]
@@ -287,3 +289,19 @@ class ClanFile(object):
                 output.write(line.line)
 
             output.write(self.end_tag)
+
+    def new_file_from_time(self, path, onset, offset, rewrite_timestamps=True):
+
+        with open(path, "wb") as output:
+            header = self.get_header()
+            lines = self.get_within_time(begin=onset, end=offset)
+            lines.shift_timestamps(dt = -onset)
+
+            for line in header:
+                if not line.is_end_header:
+                    output.write(line.line)
+            for line in lines.line_map:
+                output.write(line.line)
+            output.write(self.end_tag)
+
+

@@ -140,6 +140,7 @@ def time(self, begin=None, end=None):
 
     elif begin and end:
         for line in self.line_map:
+
             if line.time_onset >= end:
                 region_ended = True
             if line.time_onset >= begin:
@@ -215,6 +216,20 @@ def get_with_time(self, onset, offset):
         if line.time_onset == onset and line.time_offset == offset:
             results.append(line)
 
+
+def shift_timestamps(self, dt):
+    for line in self.line_map:
+        orig_tstamp = "{}_{}".format(line.time_onset, line.time_offset)
+        new_onset = line.time_onset+dt
+        new_offset = line.time_offset+dt
+        line.time_onset = new_onset
+        line.time_offset = new_offset
+
+        interv_re = interval_regx.search(line.line)
+        if interv_re:
+            line.line = line.line.replace(orig_tstamp,
+                                          "{}_{}".format(new_onset,
+                                                         new_offset))
 
 from elements import *
 from clanfile import *
