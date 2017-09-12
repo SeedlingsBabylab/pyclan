@@ -231,5 +231,10 @@ def shift_timestamps(self, dt):
                                           "{}_{}".format(new_onset,
                                                          new_offset))
 
+def clear_pho(self):
+    for line in self.line_map:
+        if line.line.startswith("%pho:"):
+            line.line = "%pho:\t\n"
+
 from elements import *
 from clanfile import *

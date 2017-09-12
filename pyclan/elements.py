@@ -52,6 +52,7 @@ class LineRange(object):
     get_tiers = filters.tier
     filter_out_tiers = filters.filter_out_tier
     shift_timestamps = filters.shift_timestamps
+    clear_pho_comments = filters.clear_pho
 
     def __init__(self, line_range):
         self.line_map = line_range
@@ -82,6 +83,7 @@ class ClanBlock(object):
     get_tiers = filters.tier
     filter_out_tiers = filters.filter_out_tier
     shift_timestamps = filters.shift_timestamps
+    clear_pho_comments = filters.clear_pho
 
     def __init__(self, block_index, line_map):
         self.index = block_index
@@ -118,6 +120,7 @@ class BlockGroup(object):
     get_tiers = filters.tier
     filter_out_tiers = filters.filter_out_tier
     shift_timestamps = filters.shift_timestamps
+    clear_pho_comments = filters.clear_pho
 
     def __init__(self, blocks):
         self.blocks = blocks

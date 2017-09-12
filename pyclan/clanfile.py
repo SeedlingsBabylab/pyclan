@@ -17,6 +17,7 @@ class ClanFile(object):
     replace_with_keyword = filters.replace_with_keyword
     replace_comments = filters.replace_comment
     shift_timestamps = filters.shift_timestamps
+    clear_pho_comments = filters.clear_pho
 
     end_tag = "@End"
 
@@ -47,6 +48,7 @@ class ClanFile(object):
             last_line = None
             seen_tier = False
             for index, line in enumerate(input):
+                # print line
                 clan_line = elements.ClanLine(index, line)
                 if line.startswith("*"):
                     seen_tier = True
@@ -125,7 +127,10 @@ class ClanFile(object):
 
 
                 if line.startswith("%"):
-                    clan_line.content = line.split("\t")[1]
+                    if line == "%pho:\r\n":
+                        clan_line.content = ""
+                    else:
+                        clan_line.content = line.split("\t")[1]
 
                     if line.startswith("%com:") or line.startswith("%xcom:"):
                         if line.count("|") > 3:
@@ -183,7 +188,7 @@ class ClanFile(object):
                         clan_line.content = line.split("\t")[1].replace(timestamp+"\n", "")
                         clan_line.is_tier_line = True
                     if line.startswith("\t"):
-                        clan_line.tier = line[1:4]
+                        # clan_line.tier = line[1:4]
                         clan_line.content = line.split("\t")[1].replace(timestamp+"\n", "")
                         clan_line.is_tier_line = True
                 else:
@@ -295,7 +300,8 @@ class ClanFile(object):
         with open(path, "wb") as output:
             header = self.get_header()
             lines = self.get_within_time(begin=onset, end=offset)
-            lines.shift_timestamps(dt = -onset)
+            if rewrite_timestamps:
+                lines.shift_timestamps(dt = -onset)
 
             for line in header:
                 if not line.is_end_header:
