@@ -21,8 +21,8 @@ class ClanLine(object):
         self.is_tier_without_timestamp = False
         self.multi_line_parent = None
         self.is_multi_parent = False
-        self.time_onset = 0
-        self.time_offset = 0
+        self.onset = 0
+        self.offset = 0
         self.total_time = 0
         self.conv_block_num = 0
         self.within_conv_block = False
@@ -42,7 +42,7 @@ class ClanLine(object):
         return self.line
 
     def timestamp(self):
-         return "{}_{}".format(self.time_onset, self.time_offset)
+         return "{}_{}".format(self.onset, self.offset)
 
 
 
@@ -96,7 +96,7 @@ class ClanBlock(object):
                 break
         for line in reversed(self.line_map):
             if line.is_tier_line:
-                self.offset = line.time_offset
+                self.offset = line.offset
                 break
 
         for line in self.line_map:
@@ -134,8 +134,9 @@ class Annotation(object):
     Annotation is a class to encapsulate all our object word
     annotations and the metadata associated with them.
     """
-    def __init__(self, word, utt_type, present,
+    def __init__(self, tier, word, utt_type, present,
                        speaker, onset=0, offset=0):
+        self.tier = tier
         self.word = word
         self.utt_type = utt_type
         self.present = present
@@ -157,6 +158,9 @@ class Annotation(object):
         s = self.speaker if speaker else "X"
 
         return "{} &={}_{}_{}".format(w, u, p, s)
+
+    def timestamp(self):
+        return "{}_{}".format(self.onset, self.offset)
 
 
 

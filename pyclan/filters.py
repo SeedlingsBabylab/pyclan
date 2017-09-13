@@ -124,14 +124,14 @@ def time(self, begin=None, end=None):
 
     if begin and not end:
         for line in self.line_map:
-            if line.time_onset >= begin:
+            if line.onset >= begin:
                 region_started = True
             if region_started:
                 results.append(line)
 
     elif end and not begin:
         for line in self.line_map:
-            if line.time_offset >= end:
+            if line.offset >= end:
                 region_ended = True
             if not region_ended:
                 if line.is_header:
@@ -141,9 +141,9 @@ def time(self, begin=None, end=None):
     elif begin and end:
         for line in self.line_map:
 
-            if line.time_onset >= end:
+            if line.onset >= end:
                 region_ended = True
-            if line.time_onset >= begin:
+            if line.onset >= begin:
                 region_started = True
             if region_started and not region_ended:
                 results.append(line)
@@ -213,17 +213,17 @@ def get_with_speaker(self, speaker):
 def get_with_time(self, onset, offset):
     results = []
     for line in self.line_map:
-        if line.time_onset == onset and line.time_offset == offset:
+        if line.onset == onset and line.offset == offset:
             results.append(line)
 
 
 def shift_timestamps(self, dt):
     for line in self.line_map:
-        orig_tstamp = "{}_{}".format(line.time_onset, line.time_offset)
-        new_onset = line.time_onset+dt
-        new_offset = line.time_offset+dt
-        line.time_onset = new_onset
-        line.time_offset = new_offset
+        orig_tstamp = "{}_{}".format(line.onset, line.offset)
+        new_onset = line.onset+dt
+        new_offset = line.offset+dt
+        line.onset = new_onset
+        line.offset = new_offset
 
         interv_re = interval_regx.search(line.line)
         if interv_re:

@@ -53,12 +53,12 @@ class ClanFile(object):
                 if line.startswith("*"):
                     seen_tier = True
                 if last_line:
-                    clan_line.time_onset = last_line.time_onset
-                    clan_line.time_offset = last_line.time_offset
+                    clan_line.onset = last_line.onset
+                    clan_line.offset = last_line.offset
                 else:
-                    clan_line.time_onset = 0
-                    clan_line.time_offset = 0
-                if clan_line.time_onset is None and index > 20:
+                    clan_line.onset = 0
+                    clan_line.offset = 0
+                if clan_line.onset is None and index > 20:
                     print
                 if (line.startswith("@") or index < 11) and not seen_tier:
                     block_delimiter = False
@@ -88,11 +88,11 @@ class ClanFile(object):
                                 line_map.append(clan_line)
                                 last_line = clan_line
                                 if last_line:
-                                    clan_line.time_onset = last_line.time_onset
-                                    clan_line.time_offset = last_line.time_offset
+                                    clan_line.onset = last_line.onset
+                                    clan_line.offset = last_line.offset
                                 else:
-                                    clan_line.time_onset = 0
-                                    clan_line.time_offset = 0
+                                    clan_line.onset = 0
+                                    clan_line.offset = 0
                                 continue
                         clan_line.is_conv_block_delimiter = block_delimiter
                         if conv_block_started:
@@ -114,11 +114,13 @@ class ClanFile(object):
 
                 if line.startswith("\t"):
                     if last_line.is_user_comment or last_line.is_tier_line or last_line.is_other_comment:
-                        last_line.is_multi_parent = True
+                        if not last_line.multi_line_parent:
+                            last_line.is_multi_parent = True
                         clan_line.multi_line_parent = last_line
                         if last_line.is_tier_line:
                             clan_line.is_tier_line = True
                             clan_line.tier = clan_line.multi_line_parent.tier
+                            clan_line.content = line.split("\t")[1].replace(timestamp + "\n", "")
                     else:
                         clan_line.multi_line_parent = last_line.multi_line_parent
                         if clan_line.multi_line_parent.is_tier_line:
@@ -167,15 +169,15 @@ class ClanFile(object):
                     timestamp = interv_regx_result.group()
                     onset = int(timestamp.split("_")[0].replace("\x15", ""))
                     offset = int(timestamp.split("_")[1].replace("\x15", ""))
-                    clan_line.time_onset = onset
-                    clan_line.time_offset = offset
+                    clan_line.onset = onset
+                    clan_line.offset = offset
                     clan_line.total_time = offset - onset
 
                     # there's no timestamp on a tier line
                     # (it wraps around to the next line)
                     if last_line.is_tier_without_timestamp:
-                        last_line.time_onset = onset
-                        last_line.time_offset = offset
+                        last_line.onset = onset
+                        last_line.offset = offset
                         last_line.total_time = offset - onset
 
                     if conv_block_started:
@@ -198,21 +200,7 @@ class ClanFile(object):
                         clan_line.is_tier_line = True
                         clan_line.is_tier_without_timestamp = True
 
-                codes = elements.code_regx.findall(line)
-                if codes:
-                    for code in codes:
-                        word = code[0]
-
-                        utt_type = code[3]
-                        present = code[5]
-                        speaker = code[7]
-                        annot = elements.Annotation(word, utt_type, present, speaker,
-                                                    onset = clan_line.time_onset,
-                                                    offset = clan_line.time_offset)
-                        annot.line_num = clan_line.index
-                        annot.orig_string = ''.join(code)
-
-                        clan_line.annotations.append(annot)
+                clan_line.annotations = self._extract_annots(clan_line.tier, clan_line.onset, clan_line.offset, line)
 
                 line_map.append(clan_line)
                 last_line = clan_line
@@ -238,8 +226,62 @@ class ClanFile(object):
             x.index = i
 
     def annotations(self):
-        annots = [x for line in self.line_map for x in line.annotations]
+        annots = []
+        multiline = []
+        for line in self.line_map:
+            if line.is_tier_line and not (line.is_multi_parent or line.multi_line_parent):
+                if multiline: # collect accumulated multiline
+                    parsed_annots = self.__collect_multiline(multiline)
+                    if parsed_annots:
+                        annots.append(parsed_annots)
+                if line.annotations:
+                    annots.append(line.annotations)
+            elif (line.is_multi_parent or line.multi_line_parent) and line.is_tier_line:
+                multiline.append(line)
+            else:
+                if multiline:
+                    parsed_annots = self.__collect_multiline(multiline)
+                    if parsed_annots:
+                        annots.append(parsed_annots)
+
         return annots
+
+    def _join_annot_cells(self, cells):
+        chunked = {}
+        for cell in cells:
+            timestamp = "{}_{}".format(cell.onset, cell.offset)
+            if timestamp not in chunked:
+                chunked[timestamp] = cell.content.replace("\n", " ").replace("\t", " ")
+            else:
+                chunked[timestamp] += " " + cell.content.replace("\n", " ").replace("\t", " ")
+        return chunked
+
+    def _extract_annots(self, tier, onset, offset, line):
+        annots = []
+        codes = elements.code_regx.findall(line)
+        if codes:
+            for code in codes:
+                word = code[0]
+                utt_type = code[3]
+                present = code[5]
+                speaker = code[7]
+                annot = elements.Annotation(tier, word, utt_type, present, speaker,
+                                            onset=onset,
+                                            offset=offset)
+                annot.orig_string = ''.join(code)
+
+                annots.append(annot)
+        return annots
+
+    def __collect_multiline(self, multiline):
+        chunked_lines = self._join_annot_cells(multiline)
+        results = []
+        for timestamp, joined_line in chunked_lines.items():
+            t = map(int, timestamp.split("_"))
+            results += self._extract_annots(multiline[0].tier, t[0], t[1], joined_line)
+        del multiline[:]
+        return results
+
 
     def clear_annotations(self):
         for line in self.line_map:
@@ -310,4 +352,12 @@ class ClanFile(object):
                 output.write(line.line)
             output.write(self.end_tag)
 
+    def basic_level(self, out):
+        annots = self.annotations()
+        with open(out, "wb") as output:
+            writer = csv.writer(output)
+            writer.writerow(["tier", "word", "utterance_type", "object_present", "speaker", "timestamp", "basic_level"])
+            for annot in annots:
+                for a in annot:
+                    writer.writerow([a.tier, a.word, a.utt_type, a.present, a.speaker, a.timestamp(), ""])
 
