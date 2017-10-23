@@ -1,5 +1,5 @@
 import re
-
+from collections import OrderedDict
 
 def user_comments(self):
     return [line for line in self.line_map if line.is_user_comment]
@@ -26,30 +26,42 @@ def conv_blocks(self, begin=1, end=None, select=None):
 
     Returns: a BlockGroup of specified conversation blocks
     """
-    blocks = []
-
-    if select:
-
-        selection_list = sorted(select)
-
-        for block_num in selection_list:
-            temp_block_lines = [line for line in self.line_map
-                                    if line.conv_block_num == block_num]
-            blocks.append(ClanBlock(block_num, temp_block_lines))
-
-        return BlockGroup(blocks)
-
     if not end:
         end = self.num_blocks
 
-    selection_list = range(begin, end+1)
+    blocks = OrderedDict()
+    select = select if select else range(begin, end+1)
 
-    for block_num in selection_list:
-        temp_block_lines = [line for line in self.line_map
-                                if line.conv_block_num == block_num]
-        blocks.append(ClanBlock(block_num, temp_block_lines))
+    for x in select:
+        blocks[x] = []
 
+    for line in self.line_map:
+        if line.conv_block_num in select:
+            blocks[line.conv_block_num].append(line)
+
+    blocks = [ClanBlock(block_num, lines) for block_num, lines in blocks.items()]
     return BlockGroup(blocks)
+
+
+
+    # select = range(begin, end+1)
+
+    # for x in select:
+    #     blocks[x] = []
+    #
+    # for line in self.line_map:
+    #     if line.conv_block_num in select:
+    #         blocks[line.conv_block_num].append(line)
+    #
+    # blocks = [ClanBlock(block_num, lines) for block_num, lines in blocks.items()]
+    # return BlockGroup(blocks)
+
+    # for block_num in selection_list:
+    #     temp_block_lines = [line for line in self.line_map
+    #                             if line.conv_block_num == block_num]
+    #     blocks.append(ClanBlock(block_num, temp_block_lines))
+    #
+    # return BlockGroup(blocks)
 
 
 def tier(self, *tiers):
@@ -235,6 +247,56 @@ def clear_pho(self):
     for line in self.line_map:
         if line.line.startswith("%pho:"):
             line.line = "%pho:\t\n"
+
+def flatten(self):
+    new_lines = []
+    multi_group = []
+    for i, line in enumerate(self.line_map):
+        if line.is_tier_line:
+            if line.is_multi_parent or line.multi_line_parent:
+                multi_group.append(line)
+                if line._has_timestamp:
+                    new_lines.append(_flatten(len(new_lines), multi_group, line.timestamp()))
+                    del multi_group[:]
+            else:
+                line.index = len(new_lines)
+                new_lines.append(line)
+        else:
+            line.index = len(new_lines)
+            new_lines.append(line)
+            del multi_group[:]
+
+    self.line_map = new_lines
+    self.flat = True
+    # return new_lines
+
+
+def _flatten(idx, group, ts):
+    if ts =="8568810_8580930":
+        print
+    final_string = ""
+    tier = None
+    for i,  cell in enumerate(group):
+        if i > 0:
+            final_string += " " + cell.content.replace("\n", " ").replace("\t", " ")
+        else:
+            final_string += cell.content.replace("\n", " ").replace("\t", " ")
+        tier = cell.tier
+    line = ClanLine(idx, "*{}\t{} {}".format(cell.tier, final_string, ts))
+    line.tier = tier
+    line.onset = cell.onset
+    line.offset = cell.offset
+    line.is_tier_line = cell.is_tier_line
+    line.conv_block_num = cell.conv_block_num
+    line.within_conv_block = cell.within_conv_block
+    if line.line.startswith("*"):
+        line.content = line.line.split("\t")[1].replace(ts+"\n", "")
+    elif line.line.startswith("%"):
+        if line.line == "%pho:\r\n":
+            line.content = ""
+        else:
+            line.content = line.line.split("\t")[1]
+    return line
 
 from elements import *
 from clanfile import *

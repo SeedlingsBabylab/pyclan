@@ -7,3 +7,4 @@ MANIFEST
 build
 .ipynb_checkpoints
 *.egg-info
+.vscode

@@ -35,6 +35,7 @@ class ClanLine(object):
         self.content = None
         self.xdb_average = 0
         self.xdb_peak = 0
+        self._has_timestamp = False
 
         self.annotations = []
 
@@ -61,8 +62,6 @@ class LineRange(object):
     def __len__(self):
         return len(self.line_map)
 
-    # def __contains__(self, key):
-    #
 
 class ClanBlock(object):
     """
@@ -92,7 +91,7 @@ class ClanBlock(object):
 
         for line in self.line_map:
             if line.is_tier_line:
-                self.onset = line.time_onset
+                self.onset = line.onset
                 break
         for line in reversed(self.line_map):
             if line.is_tier_line:
@@ -126,8 +125,15 @@ class BlockGroup(object):
         self.blocks = blocks
         self.line_map = [element for block in blocks for element in block.line_map]
         self.total_time = sum(x.length for x in blocks)
+        self.block_map = {}
+        for x in blocks:
+            self.block_map[x.index] = x
 
-
+    def get(self, n):
+        """
+        get the block with number 'n'
+        """
+        return self.block_map[n]
 
 class Annotation(object):
     """
@@ -135,7 +141,7 @@ class Annotation(object):
     annotations and the metadata associated with them.
     """
     def __init__(self, tier, word, utt_type, present,
-                       speaker, onset=0, offset=0):
+                       speaker, onset=0, offset=0, line_num=0):
         self.tier = tier
         self.word = word
         self.utt_type = utt_type
@@ -144,7 +150,8 @@ class Annotation(object):
         self.onset = onset
         self.offset = offset
         self.orig_string = ""
-        self.line_num = 0
+        self.line_num = line_num
+        self.index = 0
 
     def __repr__(self):
         return "{} &={}_{}_{}".format(self.word, self.utt_type,
