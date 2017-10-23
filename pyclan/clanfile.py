@@ -52,6 +52,9 @@ class ClanFile(object):
             seen_tier = False
             for index, line in enumerate(input):
                 # print line
+                newline_str = "\r\n" if line.endswith("\r\n") else "\n"
+                if "36815810_36816240" in line:
+                    print
                 clan_line = elements.ClanLine(index, line)
                 if line.startswith("*"):
                     seen_tier = True
@@ -181,7 +184,7 @@ class ClanFile(object):
                         if last_line.is_tier_line:
                             clan_line.is_tier_line = True
                             clan_line.tier = clan_line.multi_line_parent.tier
-                            clan_line.content = line.split("\t")[1].replace(timestamp + "\n", "")
+                            clan_line.content = line.split("\t")[1].replace(timestamp+newline_str, "")
                     else:
                         clan_line.multi_line_parent = last_line.multi_line_parent
                         if clan_line.multi_line_parent.is_tier_line:
@@ -192,6 +195,9 @@ class ClanFile(object):
                 if line.startswith("%"):
                     if line == "%pho:\r\n":
                         clan_line.content = ""
+                        clan_line.tier = last_line.tier
+                    elif line.startswith("%pho:"):
+                        clan_line.tier = last_line.tier
                     else:
                         clan_line.content = line.split("\t")[1]
 
@@ -231,16 +237,16 @@ class ClanFile(object):
 
                     if line.startswith("*"):
                         clan_line.tier = line[1:4]
-                        clan_line.content = line.split("\t")[1].replace(timestamp+"\n", "")
+                        clan_line.content = line.split("\t")[1].replace(timestamp+newline_str, "")
                         clan_line.is_tier_line = True
                     if line.startswith("\t"):
                         # clan_line.tier = line[1:4]
-                        clan_line.content = line.split("\t")[1].replace(timestamp+"\n", "")
+                        clan_line.content = line.split("\t")[1].replace(timestamp+newline_str, "")
                         clan_line.is_tier_line = True
                 else:
                     if line.startswith("*"):
                         clan_line.tier = line[1:4]
-                        clan_line.content = line.split("\t")[1].replace("\n", "")
+                        clan_line.content = line.split("\t")[1].replace(newline_str, "")
                         clan_line.is_tier_line = True
                         clan_line.is_tier_without_timestamp = True
 

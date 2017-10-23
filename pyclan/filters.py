@@ -272,15 +272,15 @@ def flatten(self):
 
 
 def _flatten(idx, group, ts):
-    if ts =="8568810_8580930":
+    if ts =="35218870_35218980":
         print
     final_string = ""
     tier = None
     for i,  cell in enumerate(group):
         if i > 0:
-            final_string += " " + cell.content.replace("\n", " ").replace("\t", " ")
+            final_string += " " + cell.content.replace("\n", " ").replace("\r", " ").replace("\t", " ")
         else:
-            final_string += cell.content.replace("\n", " ").replace("\t", " ")
+            final_string += cell.content.replace("\n", " ").replace("\r", " ").replace("\t", " ")
         tier = cell.tier
     line = ClanLine(idx, "*{}\t{} {}".format(cell.tier, final_string, ts))
     line.tier = tier
