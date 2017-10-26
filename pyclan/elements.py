@@ -152,6 +152,7 @@ class Annotation(object):
         self.orig_string = ""
         self.line_num = line_num
         self.index = 0
+        self.pho_annot = ""
 
     def __repr__(self):
         return "{} &={}_{}_{}".format(self.word, self.utt_type,

@@ -18,6 +18,7 @@ class ClanFile(object):
     replace_comments = filters.replace_comment
     shift_timestamps = filters.shift_timestamps
     clear_pho_comments = filters.clear_pho
+    delete_pho_comments = filters.delete_pho
     flatten = filters.flatten
 
     end_tag = "@End"
@@ -53,8 +54,8 @@ class ClanFile(object):
             for index, line in enumerate(input):
                 # print line
                 newline_str = "\r\n" if line.endswith("\r\n") else "\n"
-                if "36815810_36816240" in line:
-                    print
+                # if "36815810_36816240" in line:
+                #     print
                 clan_line = elements.ClanLine(index, line)
                 if line.startswith("*"):
                     seen_tier = True
@@ -64,8 +65,8 @@ class ClanFile(object):
                 else:
                     clan_line.onset = 0
                     clan_line.offset = 0
-                if clan_line.onset is None and index > 20:
-                    print
+                # if clan_line.onset is None and index > 20:
+                #     print
 
                 if conv_block_started:
                     clan_line.conv_block_num = current_conv_block
@@ -193,19 +194,20 @@ class ClanFile(object):
 
 
                 if line.startswith("%"):
-                    if line == "%pho:\r\n":
-                        clan_line.content = ""
+                    if line.startswith("%pho:"):
                         clan_line.tier = last_line.tier
-                    elif line.startswith("%pho:"):
-                        clan_line.tier = last_line.tier
-                    else:
-                        clan_line.content = line.split("\t")[1]
+                        if line == "%pho:\r\n" or line == "%pho:\n":
+                            clan_line.content = ""
+                        else:
+                            clan_line.content = line.split("\t")[1].translate(None, '\r\n')
 
                     if line.startswith("%com:") or line.startswith("%xcom:"):
                         if line.count("|") > 3:
                             clan_line.clan_comment = True
                         else:
                             clan_line.is_user_comment = True
+                        if last_line.tier:
+                            clan_line.tier = last_line.tier
 
                     elif line.startswith("%xdb:"):
                         clan_line.xdb_line = True
@@ -241,6 +243,8 @@ class ClanFile(object):
                         clan_line.is_tier_line = True
                     if line.startswith("\t"):
                         # clan_line.tier = line[1:4]
+                        if last_line.tier:
+                            clan_line.tier = last_line.tier
                         clan_line.content = line.split("\t")[1].replace(timestamp+newline_str, "")
                         clan_line.is_tier_line = True
                 else:
@@ -330,6 +334,33 @@ class ClanFile(object):
                                                         line.index)
         self.annotated = True
 
+    def assign_pho(self):
+        """
+        Assign a pho value to the CHI annotation that it belongs to.
+        :return:
+        """
+        if not self.annotated:
+            raise Exception("you need to call self.annotate() before being able to assign pho's to CHI annotations")
+
+        phos = [x for x in self.line_map if x.line.startswith("%pho:")]
+        chis = [x for x in self.annotations() if x.speaker == "CHI"]
+
+        sorted_phos = sorted(list(set(phos)), key=lambda x: x.index)
+        phos = []
+
+        for pho in sorted_phos:
+            results = pho.content.translate(None, '\r\n').split()
+            phos += results
+
+        if len(phos) != len(chis):
+            raise Exception("\n\nchis vs phos count mismatch:\n\nchis ({}): {}\n\nphos ({}): {}".format(len(chis), chis, len(phos), phos))
+        else:
+            for idx, pho in enumerate(phos):
+                chis[idx].pho_annot = pho
+
+        print
+
+
     def _join_annot_cells(self, cells):
         chunked = {}
         for cell in cells:
@@ -372,17 +403,21 @@ class ClanFile(object):
                 for annot in line.annotations:
                     line.line = line.line.replace(annot.orig_string, "")
                     line.content = line.line.replace(annot.orig_string, "")
-    def block_map(self):
-        return True
+
+    def reindex(self):
+        """
+        Assign new indices to all the ClanLines in the line_map. This also assigns
+        a new index to each annotation in every ClanLine.annotations
+        """
+        for idx, line in enumerate(self.line_map):
+            line.index = idx
+            if line.annotations:
+                for x in line.annotations:
+                    x.line_num = idx
 
     def get_header(self):
         return [line for line in self.line_map
                     if line.is_header]
-
-    def write_entries_to_csv(self, path):
-        with open(path, "wb") as output:
-            writer = csv.writer(output)
-            writer.writerow(["file", "line", "timestamp"])
 
 
     def write_to_cha(self, path):
