@@ -258,8 +258,6 @@ def flatten(self):
     multi_group = []
     for i, line in enumerate(self.line_map):
         if line.is_tier_line:
-            # if line.tier == None:
-            #     print
             if line.is_multi_parent or line.multi_line_parent:
                 multi_group.append(line)
                 if line._has_timestamp:
@@ -275,12 +273,9 @@ def flatten(self):
 
     self.line_map = new_lines
     self.flat = True
-    # return new_lines
 
 
 def _flatten(idx, group, ts):
-    # if ts =="35218870_35218980":
-    #     print
     final_string = ""
     tier = None
     for i,  cell in enumerate(group):
@@ -290,8 +285,6 @@ def _flatten(idx, group, ts):
             final_string += cell.content.replace("\n", " ").replace("\r", " ").replace("\t", " ")
         tier = cell.tier
     line = ClanLine(idx, "*{}\t{} {}".format(cell.tier, final_string, ts))
-    if tier == None:
-        print
     line.tier = tier
     line.onset = cell.onset
     line.offset = cell.offset
