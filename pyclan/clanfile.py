@@ -21,6 +21,7 @@ class ClanFile(object):
     clear_pho_comments = filters.clear_pho
     delete_pho_comments = filters.delete_pho
     flatten = filters.flatten
+    reindex_timestamps = filters.reindex_ts
 
     end_tag = "@End"
 
@@ -30,6 +31,7 @@ class ClanFile(object):
         self.num_full_blocks = 0
         self.full_block_range = False
         self.block_index = [] # list of all the full block indices in this file
+        self.ts_index = {}
         try:
             self.line_map = self.parse_file()
         except Exception as e:
@@ -263,6 +265,13 @@ class ClanFile(object):
                     clan_line.annotations = self._extract_annots(clan_line.tier, clan_line.onset, clan_line.offset, line)
 
                     line_map.append(clan_line)
+                    ts = "{}_{}".format(clan_line.onset, clan_line.offset)
+
+                    if ts in self.ts_index:
+                        self.ts_index[ts].append(clan_line)
+                    else:
+                        self.ts_index[ts] = [clan_line]
+
                     last_line = clan_line
             except Exception:
                 raise errors.ParseError(index, last_line)
@@ -425,6 +434,13 @@ class ClanFile(object):
     def get_header(self):
         return [line for line in self.line_map
                     if line.is_header]
+
+    def length(self):
+        """
+        Get the length of the CLAN file
+        :return: number of lines in the file
+        """
+        return len(self.line_map)
 
 
     def write_to_cha(self, path):

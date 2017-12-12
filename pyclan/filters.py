@@ -272,6 +272,7 @@ def flatten(self):
             del multi_group[:]
 
     self.line_map = new_lines
+    self.reindex_timestamps()
     self.flat = True
 
 
@@ -299,6 +300,17 @@ def _flatten(idx, group, ts):
         else:
             line.content = line.line.split("\t")[1]
     return line
+
+def reindex_ts(self):
+    self.ts_index = {}
+    for index, line in enumerate(self.line_map):
+        line.index = index
+        ts = line.timestamp()
+        if ts in self.ts_index:
+            self.ts_index[ts].append(line)
+        else:
+            self.ts_index[ts] = [line]
+
 
 from elements import *
 from clanfile import *
