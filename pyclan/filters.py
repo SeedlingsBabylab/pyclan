@@ -285,7 +285,7 @@ def _flatten(idx, group, ts):
         else:
             final_string += cell.content.replace("\n", " ").replace("\r", " ").replace("\t", " ")
         tier = cell.tier
-    line = ClanLine(idx, "*{}\t{} {}".format(cell.tier, final_string, ts))
+    line = ClanLine(idx, "*{}\t{} \x15{}\x15".format(cell.tier, final_string, ts))
     line.tier = tier
     line.onset = cell.onset
     line.offset = cell.offset
