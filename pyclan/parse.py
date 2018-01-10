@@ -1,3 +1,6 @@
+from . import elements
+from . import errors
+
 def parse_file(self):
     line_map = []
     with open(self.clan_path, "r") as input:
@@ -236,3 +239,4 @@ def parse_file(self):
 
     self.num_blocks = current_conv_block
     return line_map
+
