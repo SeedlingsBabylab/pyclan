@@ -254,10 +254,51 @@ def delete_pho(self):
     self.reindex()
 
 def flatten(self):
+    """
+    Flatten the file so none of the lines wrap to the next line.
+
+    Note: can only handle comments spanning at most 2 lines
+    :param self:
+    :return:
+    """
     new_lines = []
     multi_group = []
     for i, line in enumerate(self.line_map):
-        if line.is_tier_line:
+
+        if line.line.startswith("\t") \
+                and multi_group\
+                and multi_group[0].is_user_comment\
+                and not line.is_tier_line:
+            multi_group.append(line)
+            new_lines.append(_flatten_comment(len(new_lines),
+                                              multi_group))
+            del multi_group[:]
+            continue
+
+        elif line.is_tier_line and line.line.startswith("\t") and not multi_group:
+            multi_group.append(line)
+            if line._has_timestamp:
+                new_lines.append(_flatten(len(new_lines), multi_group, line.timestamp()))
+                del multi_group[:]
+            # del multi_group[:]
+            continue
+
+        elif multi_group and line.is_tier_line and line.line.startswith("\t") and multi_group[0].is_user_comment:
+            new_lines.append(_flatten_comment(len(new_lines), multi_group))
+            del multi_group[:]
+
+            multi_group.append(line)
+            if line._has_timestamp:
+                new_lines.append(_flatten(len(new_lines), multi_group, line.timestamp()))
+                del multi_group[:]
+                continue
+            # del multi_group[:]
+            # continue
+
+        elif line.is_tier_line:
+            # if multi_group and multi_group[0].is_user_comment:
+            #     new_lines.append(_flatten_comment(len(new_lines), multi_group))
+            #     multi_group[:]
             if line.is_multi_parent or line.multi_line_parent:
                 multi_group.append(line)
                 if line._has_timestamp:
@@ -266,7 +307,12 @@ def flatten(self):
             else:
                 line.index = len(new_lines)
                 new_lines.append(line)
+        elif line.is_user_comment:
+            multi_group.append(line)
         else:
+            if multi_group and multi_group[0].is_user_comment:
+                new_lines.append(_flatten_comment(len(new_lines), multi_group))
+                multi_group[:]
             line.index = len(new_lines)
             new_lines.append(line)
             del multi_group[:]
@@ -304,6 +350,19 @@ def _flatten(idx, group, ts):
             line.content = ""
         else:
             line.content = line.line.split("\t")[1]
+    return line
+
+def _flatten_comment(idx, lines):
+    new_line = " ".join([x.line for x in lines])
+    first_tab_idx = new_line.index("\t")
+    prefix = new_line[:first_tab_idx+1]
+    new_line = prefix + new_line[first_tab_idx:].replace("\t", "")
+    new_line = new_line.replace("\n", "")
+    line = ClanLine(idx, new_line)
+    line.is_user_comment = True
+    line.onset = lines[0].onset
+    line.offset = lines[0].offset
+    line.conv_block_num = lines[0].conv_block_num
     return line
 
 def reindex_ts(self):
