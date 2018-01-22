@@ -146,12 +146,13 @@ class Annotation(object):
     """
 
     def __init__(self, tier, word, utt_type, present,
-                 speaker, onset=0, offset=0, line_num=0):
+                 speaker, annotation_id, onset=0, offset=0, line_num=0):
         self.tier = tier
         self.word = word
         self.utt_type = utt_type
         self.present = present
         self.speaker = speaker
+        self.annotation_id = annotation_id
         self.onset = onset
         self.offset = offset
         self.orig_string = ""
@@ -160,17 +161,18 @@ class Annotation(object):
         self.pho_annot = ""
 
     def __repr__(self):
-        return "{} &={}_{}_{}".format(self.word, self.utt_type,
-                                      self.present, self.speaker)
+        return "{} &={}_{}_{}_{}".format(self.word, self.utt_type,
+                                      self.present, self.speaker, self.annotation_id)
 
-    def annot_string(self, word=True, utt_type=True, present=True, speaker=True):
+    def annot_string(self, word=True, utt_type=True, present=True, speaker=True, annotation_id=True):
 
         w = self.word if word else "XXXX"
         u = self.utt_type if utt_type else "X"
         p = self.present if present else "X"
         s = self.speaker if speaker else "XXX"
+        i = self.annotation_id if annotation_id else "XXXXXXXXX"
 
-        return "{} &={}_{}_{}".format(w, u, p, s)
+        return "{} &={}_{}_{}_{}".format(w, u, p, s, i)
 
     def timestamp(self):
         return "{}_{}".format(self.onset, self.offset)
@@ -182,5 +184,7 @@ pause_regx = re.compile("Pause (\d+)")
 xdb_regx = re.compile(
     "average_dB=\"([-+]?[0-9]*\.?[0-9]+)\" peak_dB=\"([-+]?[0-9]*\.?[0-9]+)\"")
 code_regx = re.compile(
-    '([a-zA-Z+]+)( +)(&=)(.)(_)(.)(_)([a-zA-Z0-9]{3})', re.IGNORECASE | re.DOTALL)
+    '([a-zA-Z+]+)( +)(&=)([A-Za-z]{1})(_)([A-Za-z]{1})(_)([A-Za-z]{3})(_)([a-z0-9]{9})', re.IGNORECASE | re.DOTALL)
+#code_regx = re.compile(
+#    '([a-zA-Z+]+)( +)(&=)(.)(_)(.)(_)([a-zA-Z0-9]{3})', re.IGNORECASE | re.DOTALL)
 # annot_regx = re.compile('(&=)(.)(_)(.)(_)([a-zA-Z0-9]{3})')

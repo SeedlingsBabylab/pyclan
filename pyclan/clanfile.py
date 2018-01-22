@@ -161,7 +161,8 @@ class ClanFile(object):
                 utt_type = code[3]
                 present = code[5]
                 speaker = code[7]
-                annot = elements.Annotation(tier, word, utt_type, present, speaker,
+                annotation_id = code[9]
+                annot = elements.Annotation(tier, word, utt_type, present, speaker, annotation_id,
                                             onset, offset, index)
                 annot.orig_string = ''.join(code)
 
