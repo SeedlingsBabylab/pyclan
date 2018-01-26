@@ -167,14 +167,14 @@ def parse_file(self):
                         if line == "%pho:\r\n" or line == "%pho:\n":
                             clan_line.content = ""
                         else:
-                            clan_line.content = line.split("\t")[1].translate(None, newline_str)
+                            clan_line.content = line.split("\t", 1)[1].rstrip()
 
                     if line.startswith("%com:") or line.startswith("%xcom:"):
                         if line.count("|") > 3:
                             clan_line.clan_comment = True
                         else:
                             clan_line.is_user_comment = True
-                            clan_line.content = line.split("\t")[1].replace(newline_str, "")
+                            clan_line.content = line.split("\t", 1)[1].replace(newline_str, "")
                         if last_line.tier:
                             clan_line.tier = last_line.tier
 

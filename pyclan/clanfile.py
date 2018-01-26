@@ -131,7 +131,7 @@ class ClanFile(object):
         phos = []
 
         for pho in sorted_phos:
-            results = pho.content.translate(None, '\r\n').split()
+            results = pho.content.translate(None, '\r\n').split('\t')
             phos += results
 
         if len(phos) != len(chis):
@@ -139,7 +139,6 @@ class ClanFile(object):
         else:
             for idx, pho in enumerate(phos):
                 chis[idx].pho_annot = pho
-
 
 
     def _join_annot_cells(self, cells):
