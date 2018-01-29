@@ -353,10 +353,11 @@ def _flatten(idx, group, ts):
     return line
 
 def _flatten_comment(idx, lines):
-    new_line = " ".join([x.line for x in lines])
+    new_line = "".join([x.line for x in lines])
     first_tab_idx = new_line.index("\t")
-    prefix = new_line[:first_tab_idx+1]
-    new_line = prefix + new_line[first_tab_idx:].replace("\t", "")
+    prefix = new_line[:first_tab_idx+1].rstrip('\t')
+    new_line = prefix + new_line[first_tab_idx:]
+    #new_line = prefix + re.sub("[\t]+", "\t", new_line[first_tab_idx:])
     new_line = new_line.replace("\n", "")
     line = ClanLine(idx, new_line)
     line.is_user_comment = True
