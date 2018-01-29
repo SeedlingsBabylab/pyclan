@@ -286,7 +286,6 @@ def flatten(self):
         elif multi_group and line.is_tier_line and line.line.startswith("\t") and multi_group[0].is_user_comment:
             new_lines.append(_flatten_comment(len(new_lines), multi_group))
             del multi_group[:]
-
             multi_group.append(line)
             if line._has_timestamp:
                 new_lines.append(_flatten(len(new_lines), multi_group, line.timestamp()))
@@ -307,7 +306,7 @@ def flatten(self):
             else:
                 line.index = len(new_lines)
                 new_lines.append(line)
-        elif line.is_user_comment:
+        elif line.is_user_comment and line.multi_line_parent:
             multi_group.append(line)
         else:
             if multi_group and multi_group[0].is_user_comment:
