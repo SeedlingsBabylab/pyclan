@@ -31,6 +31,7 @@ class ClanLine(object):
         self.within_paus_block = False
         self.is_clan_comment = False
         self.is_user_comment = False
+        self.is_user_comment_child = False
         self.is_other_comment = False
         self.xdb_line = False
         self.tier = None
@@ -40,6 +41,7 @@ class ClanLine(object):
         self._has_timestamp = False
 
         self.annotations = []
+        self.user_comment = None
 
     def __repr__(self):
         return self.line
@@ -176,6 +178,37 @@ class Annotation(object):
 
     def timestamp(self):
         return "{}_{}".format(self.onset, self.offset)
+
+
+class UserComment(object):
+    """
+    UserComment is a class to encapsulate all user comments and the metadata associated with them.
+    """
+    orig_string = None
+    root_line = None
+    parent_line = None
+    annotation_id = None
+
+    def __init__(self, line_content):
+        self.orig_string = line_content
+        match_id = re.search(r'####([A-Za-z0-9]{9})', line_content)
+        if match_id:
+            self.annotation_id = match_id.group(0).lstrip("####")
+
+    def trace_root(self, parent_line):
+        self.parent_line = parent_line
+        if parent_line.is_user_comment_child:
+            self.root_line = parent_line.user_comment.root_line
+        else:
+            self.root_line = parent_line
+        if self.annotation_id:
+            self.__trace_add_root_annot_id()
+
+    def __trace_add_root_annot_id(self):
+        cur_line = self.parent_line
+        while cur_line:
+            cur_line.user_comment.annotation_id = self.annotation_id
+            cur_line = cur_line.user_comment.parent_line
 
 
 interval_regx = re.compile("\\x15\d+_\d+\\x15")

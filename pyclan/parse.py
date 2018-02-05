@@ -146,10 +146,14 @@ def parse_file(self):
                     continue
 
                 if line.startswith("\t"):
-                    if last_line.is_user_comment or last_line.is_tier_line or last_line.is_other_comment:
+                    if last_line.is_user_comment or last_line.is_tier_line or last_line.is_other_comment or last_line.is_user_comment_child:
                         if not last_line.multi_line_parent:
                             last_line.is_multi_parent = True
                         clan_line.multi_line_parent = last_line
+                        if last_line.is_user_comment or last_line.is_user_comment_child:
+                            clan_line.is_user_comment_child = True
+                            clan_line.user_comment = elements.UserComment(line)
+                            clan_line.user_comment.trace_root(last_line)
                         if last_line.is_tier_line:
                             clan_line.is_tier_line = True
                             clan_line.tier = clan_line.multi_line_parent.tier
@@ -174,6 +178,7 @@ def parse_file(self):
                             clan_line.clan_comment = True
                         else:
                             clan_line.is_user_comment = True
+                            clan_line.user_comment = elements.UserComment(line)
                             clan_line.content = line.split("\t", 1)[1].replace(newline_str, "")
                         if last_line.tier:
                             clan_line.tier = last_line.tier
@@ -234,9 +239,9 @@ def parse_file(self):
                     self.ts_index[ts] = [clan_line]
 
                 last_line = clan_line
-        except Exception:
+        except Exception, e:
+            print e
             raise errors.ParseError(index, last_line)
 
     self.num_blocks = current_conv_block
     return line_map
-
