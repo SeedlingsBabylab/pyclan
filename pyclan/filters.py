@@ -261,60 +261,87 @@ def flatten(self):
     :param self:
     :return:
     """
+
     new_lines = []
-    multi_group = []
-    for i, line in enumerate(self.line_map):
 
-        if line.line.startswith("\t") \
-                and multi_group\
-                and multi_group[0].is_user_comment\
-                and not line.is_tier_line:
-            multi_group.append(line)
-            new_lines.append(_flatten_comment(len(new_lines),
-                                              multi_group))
-            del multi_group[:]
-            continue
+    line_index = 0
 
-        elif line.is_tier_line and line.line.startswith("\t") and not multi_group:
+    while line_index < len(self.line_map):
+        line = self.line_map[line_index]
+        if line.is_tier_line:
+            multi_group = []
             multi_group.append(line)
+            runner_index = line_index + 1
+            found_time_stamp = False
             if line._has_timestamp:
-                new_lines.append(_flatten(len(new_lines), multi_group, line.timestamp()))
-                del multi_group[:]
-            # del multi_group[:]
-            continue
-
-        elif multi_group and line.is_tier_line and line.line.startswith("\t") and multi_group[0].is_user_comment:
-            new_lines.append(_flatten_comment(len(new_lines), multi_group))
-            del multi_group[:]
+                timestamp = line.timestamp()
+                found_time_stamp = True
+            while runner_index < len(self.line_map) \
+                  and self.line_map[runner_index].line.startswith('\t') \
+                  and not found_time_stamp:
+                multi_group.append(self.line_map[runner_index])
+                if self.line_map[runner_index]._has_timestamp:
+                    found_time_stamp = True
+                    timestamp = self.line_map[runner_index].timestamp()
+                runner_index += 1
+            flatten_line = _flatten(len(new_lines), multi_group, timestamp)
+            new_lines.append(flatten_line)
+            flatten_line.index = len(new_lines)
+            line_index = runner_index
+        elif line.is_user_comment:
+            multi_group = []
             multi_group.append(line)
-            if line._has_timestamp:
-                new_lines.append(_flatten(len(new_lines), multi_group, line.timestamp()))
-                del multi_group[:]
-                continue
-            # del multi_group[:]
-            # continue
-
-        elif line.is_tier_line:
-            # if multi_group and multi_group[0].is_user_comment:
-            #     new_lines.append(_flatten_comment(len(new_lines), multi_group))
-            #     multi_group[:]
-            if line.is_multi_parent or line.multi_line_parent:
-                multi_group.append(line)
-                if line._has_timestamp:
-                    new_lines.append(_flatten(len(new_lines), multi_group, line.timestamp()))
-                    del multi_group[:]
-            else:
-                line.index = len(new_lines)
-                new_lines.append(line)
-        elif line.is_user_comment and line.multi_line_parent:
-            multi_group.append(line)
+            runner_index = line_index + 1
+            while runner_index < len(self.line_map) \
+                  and self.line_map[runner_index].line.startswith('\t'):
+                multi_group.append(self.line_map[runner_index])
+                runner_index += 1
+            flatten_line = _flatten_comment(len(new_lines), multi_group)
+            new_lines.append(flatten_line)
+            flatten_line.index = len(new_lines)
+            line_index = runner_index
         else:
-            if multi_group and multi_group[0].is_user_comment:
-                new_lines.append(_flatten_comment(len(new_lines), multi_group))
-                multi_group[:]
-            line.index = len(new_lines)
             new_lines.append(line)
-            del multi_group[:]
+            line.index = len(new_lines)
+            line_index += 1
+
+    # new_lines = []
+    # multi_group_comment = []
+    # multi_group_other = []
+
+    # for i, line in enumerate(self.line_map):
+    #
+    #     if line.line.startswith("\t"): #This is middle part of a multiline
+    #         if line.is_tier_line: #This is part of a multi tier line
+    #             multi_group_other.append(line)
+    #             if line._has_timestamp:
+    #                 flatten_line = _flatten(len(new_lines), multi_group_other, line.timestamp())
+    #                 new_lines.append(flatten_line)
+    #                 flatten_line.index = len(new_lines)
+    #                 del multi_group_other[:]
+    #         elif line.is_user_comment_child: #This is child of a comment line root
+    #                 multi_group_comment.append(line)
+    #         else:
+    #             new_lines.append(line)
+    #             line.index = len(new_lines)
+    #     else: #This is a single line or start of a multiline
+    #         if line.is_tier_line:
+    #             if multi_group_other: #Non empty group found
+    #                 flatten_line = _flatten(len(new_lines), multi_group_other, multi_group_other[0].timestamp())
+    #                 new_lines.append(flatten_line)
+    #                 flatten_line.index = len(new_lines)
+    #                 del multi_group_other[:]
+    #             multi_group_other.append(line)
+    #         elif line.is_user_comment:
+    #             if multi_group_comment: #Found a new comment root, but buffer not empty
+    #                 flatten_line = _flatten_comment(len(new_lines), multi_group_comment)
+    #                 new_lines.append(flatten_line)
+    #                 flatten_line.index = len(new_lines)
+    #                 del multi_group_comment[:]
+    #             multi_group_comment.append(line)
+    #         else:
+    #             new_lines.append(line)
+    #             line.index = len(new_lines)
 
     self.line_map = new_lines
     self.reindex_timestamps()
@@ -352,12 +379,20 @@ def _flatten(idx, group, ts):
     return line
 
 def _flatten_comment(idx, lines):
-    new_line = "".join([x.line for x in lines])
-    first_tab_idx = new_line.index("\t")
-    prefix = new_line[:first_tab_idx+1].rstrip('\t')
-    new_line = prefix + new_line[first_tab_idx:]
-    #new_line = prefix + re.sub("[\t]+", "\t", new_line[first_tab_idx:])
-    new_line = new_line.replace("\n", "")
+    # new_line = "".join([x.line for x in lines])
+    # try:
+    #     first_tab_idx = new_line.index("\t")
+    # except:
+    #     print new_line
+    # prefix = new_line[:first_tab_idx+1].rstrip('\t')
+    # new_line = prefix + new_line[first_tab_idx:]
+    # #new_line = prefix + re.sub("[\t]+", "\t", new_line[first_tab_idx:])
+    # new_line = new_line.replace("\n", "")
+    for line in lines:
+        if line.line.startswith('\t'):
+            new_line += ' ' + line.line.rstrip().lstrip('\t')
+        else:
+            new_line = line.line.rstrip()
     line = ClanLine(idx, new_line)
     line.is_user_comment = True
     line.onset = lines[0].onset
