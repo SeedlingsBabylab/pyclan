@@ -264,6 +264,26 @@ class ClanFile(object):
             phos += line.phos
         return phos
 
+    def create_pho_chi_linkage(self):
+        self.annotate()
+        annots = self.annotations()
+        if not annots:
+            return
+        else:
+            annotations = []
+            for annot in annots:
+                if type(annot) is list:
+                    annotations.extend(annot)
+                elif type(annot) is elements.Annotation:
+                    annotations.append(annot)
+            match = {}
+            for annot in annotations:
+                match[annot.annotation_id] = annot
+            phos = self.phos()
+            for pho in phos:
+                pho.annotation = match[pho.annotation_ref]
+                match[pho.annotation_ref].pho = pho
+
     def basic_level(self, out):
         annots = self.annotations()
         with open(out, "wb") as output:

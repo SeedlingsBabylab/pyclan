@@ -163,6 +163,7 @@ class Annotation(object):
         self.line_num = line_num
         self.index = 0
         self.pho_annot = ""
+        self.pho = None
 
     def __repr__(self):
         return "{} &={}_{}_{}_{}".format(self.word, self.utt_type,
@@ -224,6 +225,7 @@ class Pho(object):
     content = None
     annotation_ref = None
     pho_id = None
+    annotation = None
 
     def __init__(self, content):
         content = content.strip()
