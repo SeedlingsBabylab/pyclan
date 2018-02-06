@@ -293,7 +293,8 @@ def flatten(self):
             multi_group.append(line)
             runner_index = line_index + 1
             while runner_index < len(self.line_map) \
-                  and self.line_map[runner_index].line.startswith('\t'):
+                  and self.line_map[runner_index].line.startswith('\t') \
+                  and not self.line_map[runner_index]._has_timestamp:
                 multi_group.append(self.line_map[runner_index])
                 runner_index += 1
             flatten_line = _flatten_comment(len(new_lines), multi_group)
