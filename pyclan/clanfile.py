@@ -286,11 +286,17 @@ class ClanFile(object):
 
     def basic_level(self, out):
         annots = self.annotations()
+        error = []
+        for annot in annots:
+            error.extend(filters.check_annotation(annot))
+        if error:
+            print "Error(s) in annotation:\n"
+            for err in error:
+                print err + "\n"
+            return
         with open(out, "wb") as output:
             writer = csv.writer(output)
             writer.writerow(["tier", "word", "utterance_type", "object_present", "speaker", "timestamp", "basic_level"])
             for annot in annots:
                 for a in annot:
                     writer.writerow([a.tier, a.word, a.utt_type, a.present, a.speaker, a.timestamp(), ""])
-
-

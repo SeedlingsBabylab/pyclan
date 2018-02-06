@@ -1,5 +1,24 @@
 import re
+import codecheck
 from collections import OrderedDict
+
+def check_annotation(annotArr):
+    error = []
+    for annot in annotArr:
+        try:
+            if "*" in annot.tier:
+                assert(codecheck.check_tier_audio(annot.tier))
+            else:
+                assert(codecheck.check_tier_audio("*"+annot.tier))
+            assert(codecheck.check_word_audio(annot.word))
+            assert(codecheck.check_utterance_type_audio(annot.utt_type))
+            assert(codecheck.check_object_present_audio(annot.present))
+            assert(codecheck.check_speaker_audio(annot.speaker))
+            assert(codecheck.check_onset_offset(str(annot.onset), str(annot.offset)))
+        except AssertionError:
+            error.append(annot.__repr__() + " " + str(annot.onset) + " " + str(annot.offset))
+            #print annot.tier, annot.word, annot.utt_type, annot.present, annot.speaker, str(annot.onset), str(annot.offset)
+    return error
 
 def user_comments(self):
     return [line for line in self.line_map if line.is_user_comment]
