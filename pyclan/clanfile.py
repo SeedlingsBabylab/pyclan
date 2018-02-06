@@ -42,8 +42,6 @@ class ClanFile(object):
         self.flat = False
         self.annotated = False
 
-
-
     def insert_line(self, line, index):
         """
         Insert a ClanLine into the middle of a ClanFile at
