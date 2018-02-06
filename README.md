@@ -16,6 +16,7 @@ clone this repo, then inside the main folder, run:
 ```
 $: python setup.py install
 ```
+make sure `codecheck` Python library is installed before using `pyclan`, `codecheck` can be found in: https://github.com/SeedlingsBabylab/codecheck.git 
 
 
 ## usage examples:
