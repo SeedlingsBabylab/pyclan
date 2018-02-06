@@ -32,6 +32,7 @@ class ClanLine(object):
         self.is_clan_comment = False
         self.is_user_comment = False
         self.is_user_comment_child = False
+        self.is_pho = False
         self.is_other_comment = False
         self.xdb_line = False
         self.tier = None
@@ -42,6 +43,7 @@ class ClanLine(object):
 
         self.annotations = []
         self.user_comment = None
+        self.phos = []
 
     def __repr__(self):
         return self.line
@@ -195,6 +197,9 @@ class UserComment(object):
         if match_id:
             self.annotation_id = match_id.group(0).lstrip("####")
 
+    def __repr__(self):
+        return self.orig_string
+
     def trace_root(self, parent_line):
         self.parent_line = parent_line
         if parent_line.is_user_comment_child:
@@ -209,6 +214,37 @@ class UserComment(object):
         while cur_line:
             cur_line.user_comment.annotation_id = self.annotation_id
             cur_line = cur_line.user_comment.parent_line
+
+
+class Pho(object):
+    """
+    Pho is a class to encapsulate all user comments and the metadata associated with them.
+    """
+
+    content = None
+    annotation_ref = None
+    pho_id = None
+
+    def __init__(self, content):
+        content = content.strip()
+        num_underscore = content.count('_')
+        if num_underscore == 0:
+            self.content = content
+        elif num_underscore == 1:
+            self.content = content.split('_')[0]
+            self.pho_id = content.split('_')[1]
+        elif num_underscore == 2:
+            self.content = content.split('_')[0]
+            self.pho_id = content.split('_')[1]
+            self.annotation_ref = content.split('_')[2]
+
+    def __repr__(self):
+        if self.annotation_ref:
+            return "{}_{}_{}".format(self.content, self.pho_id, self.annotation_ref)
+        elif self.pho_id:
+            return "{}_{}".format(self.content, self.pho_id)
+        else:
+            return self.content
 
 
 interval_regx = re.compile("\\x15\d+_\d+\\x15")

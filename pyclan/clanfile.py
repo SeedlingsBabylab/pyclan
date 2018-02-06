@@ -42,6 +42,8 @@ class ClanFile(object):
         self.flat = False
         self.annotated = False
 
+
+
     def insert_line(self, line, index):
         """
         Insert a ClanLine into the middle of a ClanFile at
@@ -255,6 +257,12 @@ class ClanFile(object):
             for line in lines.line_map:
                 output.write(line.line)
             output.write(self.end_tag)
+
+    def phos(self):
+        phos = []
+        for line in self.line_map:
+            phos += line.phos
+        return phos
 
     def basic_level(self, out):
         annots = self.annotations()

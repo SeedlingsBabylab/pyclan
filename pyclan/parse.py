@@ -167,11 +167,18 @@ def parse_file(self):
 
                 if line.startswith("%"):
                     if line.startswith("%pho:"):
+                        clan_line.is_pho = True
                         clan_line.tier = last_line.tier
                         if line == "%pho:\r\n" or line == "%pho:\n":
                             clan_line.content = ""
+                            phoObj = elements.Pho("")
+                            clan_line.phos.append(phoObj)
                         else:
                             clan_line.content = line.split("\t", 1)[1].rstrip()
+                            phos = clan_line.content.split('\t')
+                            for pho in phos:
+                                phoObj = elements.Pho(pho)
+                                clan_line.phos.append(phoObj)
 
                     if line.startswith("%com:") or line.startswith("%xcom:"):
                         if line.count("|") > 3:
