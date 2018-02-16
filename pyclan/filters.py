@@ -272,57 +272,95 @@ def delete_pho(self):
     self.line_map = new_map
     self.reindex()
 
-def flatten(self):
+def flatten(path):
     """
     Flatten the file so none of the lines wrap to the next line.
 
     Note: can only handle comments spanning at most 2 lines
-    :param self:
-    :return:
+    :param:  path
+    :return: original line list, flattened line list, flatten to original index
+    dictionary, original to flatten index dictionary
     """
+    flattenedlines = []
+    lines = []
+    fodict = {}
+    ofdict = {}
+    templn = 0
+    in_block = False
+    temp_block = []
+    with open(path, "r") as input:
+        for index, line in enumerate(input):
+            lines.append(line)
+            if in_block and not line.startswith("\t"):
+                in_block = False
+                newline = ""
+                for each in temp_block:
+                    newline += each.strip() + " "
+                newline = newline[:-1] + "\n"
+                flattenedlines.append(newline)
+                temp_block = []
+            if line.startswith("%com:") or line.startswith("%xcom:") or line.startswith("*"):
+                in_block = True
+                templn = len(flattenedlines)
+                temp_block.append(line)
+                fodict[templn] = [index]
+                ofdict[index] = templn
+                continue
+            if in_block and line.startswith("\t"):
+                temp_block.append(line)
+                arr = fodict[templn]
+                arr.append(index)
+                fodict[templn] = arr
+                ofdict[index] = templn
+                continue
+            fodict[len(flattenedlines)] = [index]
+            ofdict[index] = len(flattenedlines)
+            flattenedlines.append(line)
+    return lines, flattenedlines, fodict, ofdict
 
-    new_lines = []
 
-    line_index = 0
-
-    while line_index < len(self.line_map):
-        line = self.line_map[line_index]
-        if line.is_tier_line:
-            multi_group = []
-            multi_group.append(line)
-            runner_index = line_index + 1
-            found_time_stamp = False
-            if line._has_timestamp:
-                timestamp = line.timestamp()
-                found_time_stamp = True
-            while runner_index < len(self.line_map) \
-                  and self.line_map[runner_index].line.startswith('\t') \
-                  and not found_time_stamp:
-                multi_group.append(self.line_map[runner_index])
-                if self.line_map[runner_index]._has_timestamp:
-                    found_time_stamp = True
-                    timestamp = self.line_map[runner_index].timestamp()
-                runner_index += 1
-            flatten_line = _flatten(len(new_lines), multi_group, timestamp)
-            new_lines.append(flatten_line)
-            flatten_line.index = len(new_lines)
-            line_index = runner_index
-        elif line.is_user_comment:
-            multi_group = []
-            multi_group.append(line)
-            runner_index = line_index + 1
-            while runner_index < len(self.line_map) \
-                  and self.line_map[runner_index].line.startswith('\t'):
-                multi_group.append(self.line_map[runner_index])
-                runner_index += 1
-            flatten_line = _flatten_comment(len(new_lines), multi_group)
-            new_lines.append(flatten_line)
-            flatten_line.index = len(new_lines)
-            line_index = runner_index
-        else:
-            new_lines.append(line)
-            line.index = len(new_lines)
-            line_index += 1
+    # new_lines = []
+    #
+    # line_index = 0
+    #
+    # while line_index < len(self.line_map):
+    #     line = self.line_map[line_index]
+    #     if line.is_tier_line:
+    #         multi_group = []
+    #         multi_group.append(line)
+    #         runner_index = line_index + 1
+    #         found_time_stamp = False
+    #         if line._has_timestamp:
+    #             timestamp = line.timestamp()
+    #             found_time_stamp = True
+    #         while runner_index < len(self.line_map) \
+    #               and self.line_map[runner_index].line.startswith('\t') \
+    #               and not found_time_stamp:
+    #             multi_group.append(self.line_map[runner_index])
+    #             if self.line_map[runner_index]._has_timestamp:
+    #                 found_time_stamp = True
+    #                 timestamp = self.line_map[runner_index].timestamp()
+    #             runner_index += 1
+    #         flatten_line = _flatten(len(new_lines), multi_group, timestamp)
+    #         new_lines.append(flatten_line)
+    #         flatten_line.index = len(new_lines)
+    #         line_index = runner_index
+    #     elif line.is_user_comment:
+    #         multi_group = []
+    #         multi_group.append(line)
+    #         runner_index = line_index + 1
+    #         while runner_index < len(self.line_map) \
+    #               and self.line_map[runner_index].line.startswith('\t'):
+    #             multi_group.append(self.line_map[runner_index])
+    #             runner_index += 1
+    #         flatten_line = _flatten_comment(len(new_lines), multi_group)
+    #         new_lines.append(flatten_line)
+    #         flatten_line.index = len(new_lines)
+    #         line_index = runner_index
+    #     else:
+    #         new_lines.append(line)
+    #         line.index = len(new_lines)
+    #         line_index += 1
 
     # new_lines = []
     # multi_group_comment = []
@@ -362,9 +400,9 @@ def flatten(self):
     #             new_lines.append(line)
     #             line.index = len(new_lines)
 
-    self.line_map = new_lines
-    self.reindex_timestamps()
-    self.flat = True
+    # self.line_map = new_lines
+    # self.reindex_timestamps()
+    # self.flat = True
 
 
 def _flatten(idx, group, ts):
