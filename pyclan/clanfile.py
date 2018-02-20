@@ -35,8 +35,8 @@ class ClanFile(object):
         self.block_index = [] # list of all the full block indices in this file
         self.ts_index = {}
         try:
-            lines, flattenedlines, fodict, ofdict = filters.flatten(self.clan_path)
-            self.line_map = self.parse_file(flattenedlines)
+            flattenedlines, breaks= filters.flatten(self.clan_path)
+            self.line_map = self.parse_file(flattenedlines, breaks)
         except Exception as e:
             print e
             #print "\n\nParsing Error:\n\nfile: {}\nline: {}\nonset:{}\n\n".format(self.filename, e.index, e.last_line.onset)

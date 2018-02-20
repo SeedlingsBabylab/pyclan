@@ -282,41 +282,60 @@ def flatten(path):
     dictionary, original to flatten index dictionary
     """
     flattenedlines = []
-    lines = []
-    fodict = {}
-    ofdict = {}
-    templn = 0
-    in_block = False
+    breaks = []
     temp_block = []
+    tier = False
+    comment = False
+    bp = 0
     with open(path, "r") as input:
         for index, line in enumerate(input):
-            lines.append(line)
-            if in_block and not line.startswith("\t"):
-                in_block = False
+            timestamp = interval_regx.search(line)
+            if timestamp and tier and line.startswith("\t"):
+                lineclean = line.strip()
+                if not lineclean.endswith(timestamp.group(0)):
+                    raise ParseError(index, line)
+                temp_block.append(line)
                 newline = ""
+                arr = []
                 for each in temp_block:
+                    arr.append(bp)
                     newline += each.strip() + " "
+                    bp += len(each)
                 newline = newline[:-1] + "\n"
                 flattenedlines.append(newline)
+                breaks.append(arr)
                 temp_block = []
-            if line.startswith("%com:") or line.startswith("%xcom:") or line.startswith("*"):
-                in_block = True
-                templn = len(flattenedlines)
-                temp_block.append(line)
-                fodict[templn] = [index]
-                ofdict[index] = templn
+                bp = 0
                 continue
-            if in_block and line.startswith("\t"):
+            if (tier or comment) and not line.startswith("\t"):
+                tier = False
+                comment = False
+                if len(temp_block):
+                    newline = ""
+                    arr = []
+                    for each in temp_block:
+                        arr.append(bp)
+                        newline += each.strip() + " "
+                        bp += len(each)
+                    newline = newline[:-1] + "\n"
+                    flattenedlines.append(newline)
+                    breaks.append(arr)
+                    temp_block = []
+                    bp = 0
+            if line.startswith("%com:") or line.startswith("%xcom:"):
+                comment = True
                 temp_block.append(line)
-                arr = fodict[templn]
-                arr.append(index)
-                fodict[templn] = arr
-                ofdict[index] = templn
                 continue
-            fodict[len(flattenedlines)] = [index]
-            ofdict[index] = len(flattenedlines)
+            if line.startswith("*"):
+                tier = True
+                temp_block.append(line)
+                continue
+            if (tier or comment) and line.startswith("\t"):
+                temp_block.append(line)
+                continue
             flattenedlines.append(line)
-    return lines, flattenedlines, fodict, ofdict
+            breaks.append([0])
+    return flattenedlines, breaks
 
 
     # new_lines = []
@@ -470,3 +489,4 @@ def reindex_ts(self):
 
 from elements import *
 from clanfile import *
+from errors import *

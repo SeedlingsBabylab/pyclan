@@ -1,7 +1,7 @@
 from . import elements
 from . import errors
 
-def parse_file(self, line_list):
+def parse_file(self, line_list, breaks):
     line_map = []
     # with open(self.clan_path, "r") as input:
     current_conv_block = 0
@@ -25,6 +25,7 @@ def parse_file(self, line_list):
             # if "36815810_36816240" in line:
             #     print
             clan_line = elements.ClanLine(index, line)
+            clan_line.breaks = breaks[index]
             if line.startswith("*"):
                 seen_tier = True
             if last_line:
@@ -204,7 +205,6 @@ def parse_file(self, line_list):
 
             if interv_regx_result:
                 timestamp = interv_regx_result[-1]
-                print line, timestamp
                 onset = int(timestamp.split("_")[0].replace("\x15", ""))
                 offset = int(timestamp.split("_")[1].replace("\x15", ""))
                 clan_line.onset = onset

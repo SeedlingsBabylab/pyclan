@@ -40,6 +40,7 @@ class ClanLine(object):
         self.xdb_average = 0
         self.xdb_peak = 0
         self._has_timestamp = False
+        self.breaks = []
 
         self.annotations = []
         self.user_comment = None
