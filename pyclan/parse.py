@@ -147,7 +147,7 @@ def parse_file(self, line_list, breaks):
                 continue
 
             if line.startswith("\t"):
-                if last_line.is_user_comment or last_line.is_tier_line or last_line.is_other_comment or last_line.is_user_comment_child:
+                if last_line.is_user_comment or last_line.is_tier_line or last_line.is_other_comment or last_line.is_user_comment_child or last_line.is_pho:
                     if not last_line.multi_line_parent:
                         last_line.is_multi_parent = True
                     clan_line.multi_line_parent = last_line
@@ -159,13 +159,19 @@ def parse_file(self, line_list, breaks):
                         clan_line.is_tier_line = True
                         clan_line.tier = clan_line.multi_line_parent.tier
                         clan_line.content = line.split("\t")[1].replace(timestamp+newline_str, "")
+                        print clan_line, clan_line.tier, last_line, last_line.tier
+                    #temp solution to pho tab
+                    if last_line.is_pho:
+                        # print last_line, clan_line, last_line.tier
+                        clan_line.is_pho = True
+                        clan_line.tier = last_line.tier
                 else:
                     clan_line.multi_line_parent = last_line.multi_line_parent
                     if clan_line.multi_line_parent.is_tier_line:
                         clan_line.is_tier_line = True
                         clan_line.tier = clan_line.multi_line_parent.tier
 
-
+            #Issue with pho line block tier missing, need to be record?
             if line.startswith("%"):
                 if line.startswith("%pho:"):
                     clan_line.is_pho = True
@@ -223,19 +229,19 @@ def parse_file(self, line_list, breaks):
                     clan_line.tier = line[1:4]
                     clan_line.content = line.split("\t")[1].replace(timestamp+newline_str, "")
                     clan_line.is_tier_line = True
-                if line.startswith("\t"):
-                    # clan_line.tier = line[1:4]
-                    if last_line.tier:
-                        clan_line.tier = last_line.tier
-                    # if clan_line.multi_line_parent and clan_line.multi_line_parent.is_tier_line:
-                    #     temp_line = clan_line.multi_line_parent
-                    #     temp_line.annotations = self._extract_annots(temp_line.tier, onset, offset, temp_line.line)
-                    #     while temp_line.multi_line_parent and temp_line.multi_line_parent.is_tier_line:
-                    #         tempn = temp_line.multi_line_parent
-                    #         tempn.annotations = self._extract_annots(tempn.tier, onset, offset, tempn.line)
-                    #         temp_line = tempn
-                    clan_line.content = line.split("\t")[1].replace(timestamp+newline_str, "")
-                    clan_line.is_tier_line = True
+                # if line.startswith("\t"):
+                #     # clan_line.tier = line[1:4]
+                #     if last_line.tier:
+                #         clan_line.tier = last_line.tier
+                #     # if clan_line.multi_line_parent and clan_line.multi_line_parent.is_tier_line:
+                #     #     temp_line = clan_line.multi_line_parent
+                #     #     temp_line.annotations = self._extract_annots(temp_line.tier, onset, offset, temp_line.line)
+                #     #     while temp_line.multi_line_parent and temp_line.multi_line_parent.is_tier_line:
+                #     #         tempn = temp_line.multi_line_parent
+                #     #         tempn.annotations = self._extract_annots(tempn.tier, onset, offset, tempn.line)
+                #     #         temp_line = tempn
+                #     clan_line.content = line.split("\t")[1].replace(timestamp+newline_str, "")
+                #     clan_line.is_tier_line = True
             else:
                 if line.startswith("*"):
                     clan_line.tier = line[1:4]

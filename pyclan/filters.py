@@ -326,11 +326,15 @@ def flatten(path):
                 comment = True
                 temp_block.append(line)
                 continue
-            if line.startswith("*"):
+            if line.startswith("*") or (tier and line.startswith("\t")):
                 tier = True
-                temp_block.append(line)
-                continue
-            if (tier or comment) and line.startswith("\t"):
+                if not timestamp:
+                    temp_block.append(line)
+                    continue
+                lineclean = line.strip()
+                if not lineclean.endswith(timestamp.group(0)):
+                    raise ParseError(index, line)
+            if comment and line.startswith("\t"):
                 temp_block.append(line)
                 continue
             flattenedlines.append(line)
