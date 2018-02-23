@@ -22,8 +22,6 @@ def parse_file(self, line_list, breaks):
         for index, line in enumerate(line_list):
             # print line
             newline_str = "\r\n" if line.endswith("\r\n") else "\n"
-            # if "36815810_36816240" in line:
-            #     print
             clan_line = elements.ClanLine(index, line)
             clan_line.breaks = breaks[index]
             if line.startswith("*"):
@@ -147,29 +145,12 @@ def parse_file(self, line_list, breaks):
                 continue
 
             if line.startswith("\t"):
-                if last_line.is_user_comment or last_line.is_tier_line or last_line.is_other_comment or last_line.is_user_comment_child or last_line.is_pho:
-                    if not last_line.multi_line_parent:
-                        last_line.is_multi_parent = True
-                    clan_line.multi_line_parent = last_line
-                    if last_line.is_user_comment or last_line.is_user_comment_child:
-                        clan_line.is_user_comment_child = True
-                        clan_line.user_comment = elements.UserComment(line)
-                        clan_line.user_comment.trace_root(last_line)
-                    if last_line.is_tier_line:
-                        clan_line.is_tier_line = True
-                        clan_line.tier = clan_line.multi_line_parent.tier
-                        clan_line.content = line.split("\t")[1].replace(timestamp+newline_str, "")
-                        print clan_line, clan_line.tier, last_line, last_line.tier
-                    #temp solution to pho tab
-                    if last_line.is_pho:
-                        # print last_line, clan_line, last_line.tier
-                        clan_line.is_pho = True
-                        clan_line.tier = last_line.tier
+                if last_line.is_tier_line:
+                    clan_line.is_tier_line = True
+                    clan_line.tier = last_line.tier
+                    clan_line.content = line.split("\t")[1].replace(timestamp+newline_str, "")
                 else:
-                    clan_line.multi_line_parent = last_line.multi_line_parent
-                    if clan_line.multi_line_parent.is_tier_line:
-                        clan_line.is_tier_line = True
-                        clan_line.tier = clan_line.multi_line_parent.tier
+                    raise errors.ParseError(index, last_line)
 
             #Issue with pho line block tier missing, need to be record?
             if line.startswith("%"):
@@ -194,7 +175,7 @@ def parse_file(self, line_list, breaks):
                         clan_line.is_user_comment = True
                         clan_line.user_comment = elements.UserComment(line)
                         clan_line.content = line.split("\t", 1)[1].replace(newline_str, "")
-                    if last_line.tier:
+                    if last_line.is_tier_line:
                         clan_line.tier = last_line.tier
 
                 elif line.startswith("%xdb:"):

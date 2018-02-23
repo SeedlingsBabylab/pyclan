@@ -1,5 +1,4 @@
 import re
-import codecheck
 from collections import OrderedDict
 
 def check_annotation(annotArr):
@@ -295,7 +294,10 @@ def flatten(path):
                 if not lineclean.endswith(timestamp.group(0)):
                     raise ParseError(index, line)
                 temp_block.append(line)
-                newline = ""
+                if temp_block[0].startswith('*'):
+                    newline = ""
+                else:
+                    newline = "\t"
                 arr = []
                 for each in temp_block:
                     arr.append(bp)

@@ -21,8 +21,6 @@ class ClanLine(object):
         self.is_paus_block_delimiter = False
         self.is_tier_line = False
         self.is_tier_without_timestamp = False
-        self.multi_line_parent = None
-        self.is_multi_parent = False
         self.onset = 0
         self.offset = 0
         self.total_time = 0
@@ -189,8 +187,6 @@ class UserComment(object):
     UserComment is a class to encapsulate all user comments and the metadata associated with them.
     """
     orig_string = None
-    root_line = None
-    parent_line = None
     annotation_id = None
 
     def __init__(self, line_content):
@@ -201,22 +197,6 @@ class UserComment(object):
 
     def __repr__(self):
         return self.orig_string
-
-    def trace_root(self, parent_line):
-        self.parent_line = parent_line
-        if parent_line.is_user_comment_child:
-            self.root_line = parent_line.user_comment.root_line
-        else:
-            self.root_line = parent_line
-        if self.annotation_id:
-            self.__trace_add_root_annot_id()
-
-    def __trace_add_root_annot_id(self):
-        cur_line = self.parent_line
-        while cur_line:
-            cur_line.user_comment.annotation_id = self.annotation_id
-            cur_line = cur_line.user_comment.parent_line
-
 
 class Pho(object):
     """
