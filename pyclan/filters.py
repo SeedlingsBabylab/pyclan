@@ -316,7 +316,7 @@ def flatten(path):
                     for each in temp_block:
                         arr.append(bp)
                         newline += each.strip() + " "
-                        bp += len(each)
+                        bp += len(each.strip())+1
                     newline = newline[:-1] + "\n"
                     flattenedlines.append(newline)
                     breaks.append(arr)
