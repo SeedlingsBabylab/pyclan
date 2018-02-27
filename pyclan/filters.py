@@ -326,6 +326,15 @@ def flatten(path):
             if comment and line.startswith("\t") and not timestamp:
                 temp_block.append(line)
                 continue
+            if (not tier) and timestamp and line.startswith("\t"):
+                lastline = flattenedlines[last_tier_index]
+                if not interval_regx.search(lastline):
+                    breaks[last_tier_index] = breaks[last_tier_index].append(len(lastline)+1)
+                    flattenedlines[last_tier_index] = lastline + " " + line.strip()
+                else:
+                    flattenedlines.insert(last_tier_index+1, line)
+                    breaks.insert(last_tier_index+1, [0])
+                continue
             if tier:
                 last_tier_index = len(flattenedlines)
             flattenedlines.append(line)
