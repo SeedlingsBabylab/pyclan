@@ -287,60 +287,64 @@ def flatten(path):
     tier = False
     comment = False
     bp = 0
+    last_tier_index = 0
     with open(path, "r") as input:
         for index, line in enumerate(input):
             timestamp = interval_regx.search(line)
-            if timestamp and tier and line.startswith("\t"):
-                lineclean = line.strip()
-                if not lineclean.endswith(timestamp.group(0)):
-                    raise ParseError(index, line)
-                temp_block.append(line)
-                newline = ""
-                arr = []
-                for each in temp_block:
-                    arr.append(bp)
-                    newline += each.strip() + " "
-                    bp += len(each)
-                newline = newline[:-1] + "\n"
-                flattenedlines.append(newline)
-                breaks.append(arr)
-                temp_block = []
-                bp = 0
-                continue
-            if (tier or comment) and not line.startswith("\t"):
-                tier = False
-                comment = False
-                if len(temp_block):
-                    newline = ""
-                    arr = []
-                    for each in temp_block:
-                        arr.append(bp)
-                        newline += each.strip() + " "
-                        bp += len(each.strip())+1
-                    newline = newline[:-1] + "\n"
-                    flattenedlines.append(newline)
-                    breaks.append(arr)
-                    temp_block = []
-                    bp = 0
-            if line.startswith("%com:") or line.startswith("%xcom:"):
-                comment = True
-                temp_block.append(line)
-                continue
-            if line.startswith("*") or (tier and line.startswith("\t")):
+            lineclean = line.strip()
+            if not lineclean.endswith(timestamp.group(0)):
+                raise ParseError(index, line)
+            if line.startswith("*"):
                 tier = True
                 if not timestamp:
                     temp_block.append(line)
                     continue
-                lineclean = line.strip()
-                if not lineclean.endswith(timestamp.group(0)):
-                    raise ParseError(index, line)
-            if comment and line.startswith("\t"):
+            if tier and line.startswith("\t"):
+                if not timestamp:
+                    temp_block.append(line)
+                elif len(temp_block):
+                    temp_block.append(line)
+                    newline, arr = block(temp_block)
+                    last_tier_index = len(flattenedlines)
+                    flattenedlines.append(newline)
+                    breaks.append(arr)
+                    temp_block = []
+                    continue
+            #Even if the last tier line is not ended with timestamp, it is flattened and temp_block emptied
+            if (tier or comment) and not line.startswith("\t"):
+                tier = False
+                comment = False
+                if len(temp_block):
+                    newline, arr = block(temp_block)
+                    flattenedlines.append(newline)
+                    breaks.append(arr)
+                    temp_block = []
+            if line.startswith("%com:") or line.startswith("%xcom:"):
+                comment = True
                 temp_block.append(line)
                 continue
+            if comment and line.startswith("\t") and not timestamp:
+                temp_block.append(line)
+                continue
+            if tier:
+                last_tier_index = len(flattenedlines)
             flattenedlines.append(line)
             breaks.append([0])
     return flattenedlines, breaks
 
+def block(temp_block):
+    bp = 0
+    if each[0].startswith("*"):
+        newline = ""
+    else:
+        newline = "\t"
+    arr = []
+    for each in temp_block:
+        arr.append(bp)
+        newline += each.strip() + " "
+        bp += len(each.strip()) + 1
+    newline = newline[:-1] + "\n"
+    return newline, arr
 
     # new_lines = []
     #
