@@ -21,7 +21,6 @@ class ClanFile(object):
     shift_timestamps = filters.shift_timestamps
     clear_pho_comments = filters.clear_pho
     delete_pho_comments = filters.delete_pho
-    flatten = filters.flatten
     reindex_timestamps = filters.reindex_ts
     parse_file = parse.parse_file
 
@@ -35,7 +34,7 @@ class ClanFile(object):
         self.block_index = [] # list of all the full block indices in this file
         self.ts_index = {}
         try:
-            flattenedlines, breaks= filters.flatten(self.clan_path)
+            flattenedlines, breaks= filters._preparse_flatten(self.clan_path)
             self.line_map = self.parse_file(flattenedlines, breaks)
         except Exception as e:
             print e
@@ -213,7 +212,12 @@ class ClanFile(object):
     def write_to_cha(self, path):
         with open(path, "wb") as output:
             for line in self.line_map:
-                output.write(line.line)
+                if len(line.breaks)>1:
+                    for i in range(1, len(line.breaks)):
+                        output.write(line.line[line.breaks[i-1]:line.breaks[i]] + '\n')
+                    output.write(line.line[line.breaks[-1]:])
+                else:
+                    output.write(line.line)
 
     def new_file_from_blocks(self, path, blocks=[], rewrite_timestamps=False,
                              begin=1, end=None):

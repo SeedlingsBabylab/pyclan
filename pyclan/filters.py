@@ -272,7 +272,7 @@ def delete_pho(self):
     self.line_map = new_map
     self.reindex()
 
-def flatten(path):
+def _preparse_flatten(path):
     """
     Flatten the file so none of the lines wrap to the next line.
 
@@ -301,7 +301,7 @@ def flatten(path):
                         continue
                     elif len(temp_block):
                         temp_block.append(line)
-                        newline, arr = block(temp_block)
+                        newline, arr = _block(temp_block)
                         last_tier_index = len(flattenedlines)
                         flattenedlines.append(newline)
                         breaks.append(arr)
@@ -312,7 +312,7 @@ def flatten(path):
                     tier = False
                     comment = False
                     if len(temp_block):
-                        newline, arr = block(temp_block)
+                        newline, arr = _block(temp_block)
                         if tier:
                             last_tier_index = len(flattenedlines)
                         flattenedlines.append(newline)
@@ -351,7 +351,7 @@ def flatten(path):
             raise ParseError(index, line)
     return flattenedlines, breaks
 
-def block(temp_block):
+def _block(temp_block):
     bp = 0
     if temp_block[0].startswith("*") or temp_block[0].startswith("%"):
         newline = ""
