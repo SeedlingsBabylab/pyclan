@@ -39,7 +39,7 @@ class ClanFile(object):
             self.line_map = self.parse_file(flattenedlines, breaks)
         except Exception as e:
             print e
-            #print "\n\nParsing Error:\n\nfile: {}\nline: {}\nonset:{}\n\n".format(self.filename, e.index, e.last_line.onset)
+            # print "\n\nParsing Error:\n\nfile: {}\nline: {}\nonset:{}\n\n".format(self.filename, e.index, e.last_line.onset)
         self.total_time = sum(line.total_time for line in self.line_map if line.is_tier_line)
         self.flat = False
         self.annotated = False

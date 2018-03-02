@@ -159,7 +159,6 @@ def parse_file(self, line_list, breaks):
                         clan_line.is_tier_line = True
                         clan_line.tier = clan_line.multi_line_parent.tier
                         clan_line.content = line.split("\t")[1].replace(timestamp+newline_str, "")
-                        print clan_line, clan_line.tier, last_line, last_line.tier
                     #temp solution to pho tab
                     if last_line.is_pho:
                         # print last_line, clan_line, last_line.tier
@@ -262,6 +261,7 @@ def parse_file(self, line_list, breaks):
             last_line = clan_line
     except Exception, e:
         print e
+        print line
         raise errors.ParseError(index, last_line)
 
     self.num_blocks = current_conv_block
