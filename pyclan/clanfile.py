@@ -92,7 +92,10 @@ class ClanFile(object):
                         if parsed_annots:
                             annots.append(parsed_annots)
 
-            return annots
+            annots_flat = []
+            for item in annots:
+                annots_flat.extend(item)
+            return annots_flat
 
     def _flat_annotations(self):
         result = []
