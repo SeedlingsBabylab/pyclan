@@ -256,7 +256,7 @@ pause_regx = re.compile("Pause (\d+)")
 xdb_regx = re.compile(
     "average_dB=\"([-+]?[0-9]*\.?[0-9]+)\" peak_dB=\"([-+]?[0-9]*\.?[0-9]+)\"")
 code_regx = re.compile(
-    '([a-zA-Z+]+)( +)(&=)([A-Za-z]{1})(_)([A-Za-z]{1})(_)([A-Za-z0-9]{3})(_)([a-z0-9]{9})', re.IGNORECASE | re.DOTALL)
+    '([a-zA-Z+]+)( +)(&=)([A-Za-z]{1})(_)([A-Za-z]{1})(_)([A-Za-z0-9]{3})(_)?([a-z0-9]{9})?', re.IGNORECASE | re.DOTALL)
 #code_regx = re.compile(
 #    '([a-zA-Z+]+)( +)(&=)(.)(_)(.)(_)([a-zA-Z0-9]{3})', re.IGNORECASE | re.DOTALL)
 # annot_regx = re.compile('(&=)(.)(_)(.)(_)([a-zA-Z0-9]{3})')
