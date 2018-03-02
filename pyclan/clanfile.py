@@ -72,7 +72,7 @@ class ClanFile(object):
 
         :return: a list of Annotation objects
         """
-        if self.flat and self.annotated:
+        if self.annotated:
             return self._flat_annotations()
         else:
             annots = []
