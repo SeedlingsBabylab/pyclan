@@ -1,5 +1,6 @@
 import csv
 import os
+import re
 
 from pyclan import filters
 from pyclan import elements
@@ -135,7 +136,7 @@ class ClanFile(object):
         phos = []
 
         for pho in sorted_phos:
-            results = pho.content.translate(None, '\r\n').split('\t')
+            results = re.split(r'[\t| ]', pho.content.translate(None, '\r\n'))
             phos += results
 
         if len(phos) != len(chis):
