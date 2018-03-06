@@ -307,6 +307,6 @@ class ClanFile(object):
         with open(out, "wb") as output:
             writer = csv.writer(output)
             writer.writerow(["tier", "word", "utterance_type", "object_present", "speaker", "timestamp", "annotation_id", "basic_level"])
-            for annot in annots:
-                for a in annot:
-                    writer.writerow([a.tier, a.word, a.utt_type, a.present, a.speaker, a.timestamp(), a.annotation_id, ""])
+            for a in annots:
+                # for a in annot:
+                writer.writerow([a.tier, a.word, a.utt_type, a.present, a.speaker, a.timestamp(), a.annotation_id, ""])
