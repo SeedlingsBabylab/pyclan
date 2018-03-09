@@ -167,9 +167,10 @@ class Annotation(object):
         self.pho = None
 
     def __repr__(self):
-        return "{} &={}_{}_{}_{}".format(self.word, self.utt_type,
-                                      self.present, self.speaker, self.annotation_id)
-
+        if self.annotation_id:
+            return "{} &={}_{}_{}_{}".format(self.word, self.utt_type, self.present, self.speaker, self.annotation_id)
+        else:
+            return "{} &={}_{}_{}".format(self.word, self.utt_type, self.present, self.speaker)
     def annot_string(self, word=True, utt_type=True, present=True, speaker=True, annotation_id=True):
 
         w = self.word if word else "XXXX"
@@ -256,7 +257,7 @@ pause_regx = re.compile("Pause (\d+)")
 xdb_regx = re.compile(
     "average_dB=\"([-+]?[0-9]*\.?[0-9]+)\" peak_dB=\"([-+]?[0-9]*\.?[0-9]+)\"")
 code_regx = re.compile(
-    '([a-zA-Z+]+)( +)(&=)([A-Za-z]{1})(_)([A-Za-z]{1})(_)([A-Z]{1}[A-Z0-9]{2})(_)?([a-z0-9]{9})?', re.IGNORECASE | re.DOTALL)
+    '([a-zA-Z+]+)( +)(&=)([A-Za-z]{1})(_)([A-Za-z]{1})(_)([A-Z]{1}[A-Z0-9]{2})(_[a-z0-9]{9})?', re.IGNORECASE | re.DOTALL)
 #code_regx = re.compile(
 #    '([a-zA-Z+]+)( +)(&=)(.)(_)(.)(_)([a-zA-Z0-9]{3})', re.IGNORECASE | re.DOTALL)
 # annot_regx = re.compile('(&=)(.)(_)(.)(_)([a-zA-Z0-9]{3})')

@@ -75,28 +75,9 @@ class ClanFile(object):
         if self.annotated:
             return self._flat_annotations()
         else:
-            annots = []
-            multiline = []
-            for i, line in enumerate(self.line_map):
-                if line.is_tier_line and not (line.is_multi_parent or line.multi_line_parent):
-                    if multiline: # collect accumulated multiline
-                        parsed_annots = self.__collect_multiline(multiline)
-                        if parsed_annots:
-                            annots.append(parsed_annots)
-                    if line.annotations:
-                        annots.append(line.annotations)
-                elif (line.is_multi_parent or line.multi_line_parent) and line.is_tier_line:
-                    multiline.append(line)
-                else:
-                    if multiline:
-                        parsed_annots = self.__collect_multiline(multiline)
-                        if parsed_annots:
-                            annots.append(parsed_annots)
+            self.annotate()
+            return self._flat_annotations()
 
-            annots_flat = []
-            for item in annots:
-                annots_flat.extend(item)
-            return annots_flat
 
     def _flat_annotations(self):
         result = []
@@ -145,7 +126,6 @@ class ClanFile(object):
             for idx, pho in enumerate(phos):
                 chis[idx].pho_annot = pho
 
-
     def _join_annot_cells(self, cells):
         chunked = {}
         for cell in cells:
@@ -165,7 +145,9 @@ class ClanFile(object):
                 utt_type = code[3]
                 present = code[5]
                 speaker = code[7]
-                annotation_id = code[9]
+                annotation_id = code[8]
+                if annotation_id:
+                    annotation_id = annotation_id.lstrip('_')
                 annot = elements.Annotation(tier, word, utt_type, present, speaker, annotation_id,
                                             onset, offset, index)
                 annot.orig_string = ''.join(code)
@@ -202,8 +184,7 @@ class ClanFile(object):
                     x.line_num = idx
 
     def get_header(self):
-        return [line for line in self.line_map
-                    if line.is_header]
+        return [line for line in self.line_map if line.is_header]
 
     def length(self):
         """
@@ -218,7 +199,7 @@ class ClanFile(object):
             for line in self.line_map:
                 if len(line.breaks)>1:
                     for i in range(1, len(line.breaks)):
-                        output.write(line.line[line.breaks[i-1]:line.breaks[i]] + '\n')
+                        output.write(line.line[line.breaks[i-1]:line.breaks[i]].strip() + '\n\t')
                     output.write(line.line[line.breaks[-1]:])
                 else:
                     output.write(line.line)
