@@ -18,12 +18,14 @@ def parse_file(self, line_list, breaks):
 
     last_line = None
     seen_tier = False
+    in_skip_region = False
     try:
         for index, line in enumerate(line_list):
             # print line
             newline_str = "\r\n" if line.endswith("\r\n") else "\n"
             clan_line = elements.ClanLine(index, line)
             clan_line.breaks = breaks[index]
+            clan_line.in_skip_region = in_skip_region
             if line.startswith("*"):
                 seen_tier = True
             if last_line:
@@ -169,6 +171,11 @@ def parse_file(self, line_list, breaks):
                             clan_line.phos.append(phoObj)
 
                 if line.startswith("%com:") or line.startswith("%xcom:"):
+                    if line.find('begin skip')>=0:
+                        in_skip_region = True
+                    if line.find('end skip')>=0:
+                        in_skip_region = False
+                    clan_line.in_skip_region = in_skip_region
                     if line.count("|") > 3:
                         clan_line.clan_comment = True
                     else:

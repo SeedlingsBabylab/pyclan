@@ -276,7 +276,12 @@ class ClanFile(object):
                 match[pho.annotation_ref].pho = pho
 
     def basic_level(self, out):
-        annots = self.annotations()
+        annots = []
+        for line in self.line_map:
+            if line.is_tier_line and not line.in_skip_region:
+                annots += self._extract_annots(line.tier, line.onset,
+                                                        line.offset, line.content,
+                                                        line.index)
         error = []
         for annot in annots:
             error.extend(filters.check_annotation(annot))
