@@ -34,11 +34,14 @@ class ClanFile(object):
         self.full_block_range = False
         self.block_index = [] # list of all the full block indices in this file
         self.ts_index = {}
-        try:
-            flattenedlines, breaks= filters._preparse_flatten(self.clan_path)
-            self.line_map = self.parse_file(flattenedlines, breaks)
-        except Exception as e:
-            print e
+        # try:
+        # print("here")
+        flattenedlines, breaks= filters._preparse_flatten(self.clan_path)
+        # print("there")
+        self.line_map = self.parse_file(flattenedlines, breaks)
+        # print("and back")
+        # except Exception as e:
+            # print e
             # print "\n\nParsing Error:\n\nfile: {}\nline: {}\nonset:{}\n\n".format(self.filename, e.index, e.last_line.onset)
         self.total_time = sum(line.total_time for line in self.line_map if line.is_tier_line)
         self.flat = False
@@ -145,7 +148,7 @@ class ClanFile(object):
                 utt_type = code[3]
                 present = code[5]
                 speaker = code[7]
-                annotation_id = code[8]
+                annotation_id = code[9]
                 if annotation_id:
                     annotation_id = annotation_id.lstrip('_')
                 annot = elements.Annotation(tier, word, utt_type, present, speaker, annotation_id,

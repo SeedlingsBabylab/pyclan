@@ -281,6 +281,7 @@ def _preparse_flatten(path):
     :return: original line list, flattened line list, flatten to original index
     dictionary, original to flatten index dictionary
     """
+
     flattenedlines = []
     breaks = []
     temp_block = []
@@ -289,66 +290,68 @@ def _preparse_flatten(path):
     bp = 0
     last_tier_index = 0
     with open(path, "r") as input:
-        try:
-            for index, line in enumerate(input):
-                timestamp = interval_regx.search(line)
-                lineclean = line.strip()
-                if timestamp and not lineclean.endswith(timestamp.group(0)):
-                    raise ParseError(index, line)
-                if tier and line.startswith("\t"):
-                    if not timestamp:
-                        temp_block.append(line)
-                        continue
-                    elif len(temp_block):
-                        temp_block.append(line)
-                        newline, arr = _block(temp_block)
-                        last_tier_index = len(flattenedlines)
-                        flattenedlines.append(newline)
-                        breaks.append(arr)
-                        temp_block = []
-                        continue
-                #Even if the last tier line is not ended with timestamp, it is flattened and temp_block emptied
-                if (tier or comment) and not line.startswith("\t"):
-                    tier = False
-                    comment = False
-                    if len(temp_block):
-                        newline, arr = _block(temp_block)
-                        if tier:
-                            last_tier_index = len(flattenedlines)
-                        flattenedlines.append(newline)
-                        breaks.append(arr)
-                        temp_block = []
-                if line.startswith("*"):
-                    tier = True
-                    if not timestamp:
-                        temp_block.append(line)
-                        continue
-                if line.startswith("%com:") or line.startswith("%xcom:"):
-                    comment = True
+        # try:
+        for index, line in enumerate(input):
+            timestamp = interval_regx.search(line)
+            lineclean = line.strip()
+
+            if timestamp and not lineclean.endswith(timestamp.group(0)):
+
+                raise ParseError(index, line)
+            if tier and line.startswith("\t"):
+                if not timestamp:
                     temp_block.append(line)
                     continue
-                if comment and line.startswith("\t") and not timestamp:
+                elif len(temp_block):
                     temp_block.append(line)
-                    continue
-                if (not tier) and timestamp and line.startswith("\t"):
-                    lastline = flattenedlines[last_tier_index]
-                    if not interval_regx.search(lastline):
-                        arr = breaks[last_tier_index]
-                        arr.append(len(lastline)+1)
-                        breaks[last_tier_index] = arr
-                        flattenedlines[last_tier_index] = lastline + " " + line.strip()
-                    else:
-                        flattenedlines.insert(last_tier_index+1, line)
-                        breaks.insert(last_tier_index+1, [0])
-                        last_tier_index += 1
-                    continue
-                if tier:
+                    newline, arr = _block(temp_block)
                     last_tier_index = len(flattenedlines)
-                flattenedlines.append(line)
-                breaks.append([0])
-        except Exception, e:
-            print e
-            raise ParseError(index, line)
+                    flattenedlines.append(newline)
+                    breaks.append(arr)
+                    temp_block = []
+                    continue
+            #Even if the last tier line is not ended with timestamp, it is flattened and temp_block emptied
+            if (tier or comment) and not line.startswith("\t"):
+                tier = False
+                comment = False
+                if len(temp_block):
+                    newline, arr = _block(temp_block)
+                    if tier:
+                        last_tier_index = len(flattenedlines)
+                    flattenedlines.append(newline)
+                    breaks.append(arr)
+                    temp_block = []
+            if line.startswith("*"):
+                tier = True
+                if not timestamp:
+                    temp_block.append(line)
+                    continue
+            if line.startswith("%com:") or line.startswith("%xcom:"):
+                comment = True
+                temp_block.append(line)
+                continue
+            if comment and line.startswith("\t") and not timestamp:
+                temp_block.append(line)
+                continue
+            if (not tier) and timestamp and line.startswith("\t"):
+                lastline = flattenedlines[last_tier_index]
+                if not interval_regx.search(lastline):
+                    arr = breaks[last_tier_index]
+                    arr.append(len(lastline)+1)
+                    breaks[last_tier_index] = arr
+                    flattenedlines[last_tier_index] = lastline + " " + line.strip()
+                else:
+                    flattenedlines.insert(last_tier_index+1, line)
+                    breaks.insert(last_tier_index+1, [0])
+                    last_tier_index += 1
+                continue
+            if tier:
+                last_tier_index = len(flattenedlines)
+            flattenedlines.append(line)
+            breaks.append([0])
+        # except Exception, e:
+        #     print e
+        #     raise ParseError(index, line)
     return flattenedlines, breaks
 
 def _block(temp_block):

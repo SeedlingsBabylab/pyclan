@@ -1,6 +1,7 @@
 from . import elements
 from . import errors
 
+
 def parse_file(self, line_list, breaks):
     line_map = []
     # with open(self.clan_path, "r") as input:
@@ -19,8 +20,11 @@ def parse_file(self, line_list, breaks):
     last_line = None
     seen_tier = False
     in_skip_region = False
+
     try:
         for index, line in enumerate(line_list):
+            # print(index,line)
+            # print(index,line)
             # print line
             newline_str = "\r\n" if line.endswith("\r\n") else "\n"
             clan_line = elements.ClanLine(index, line)
