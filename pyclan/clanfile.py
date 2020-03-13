@@ -8,7 +8,7 @@ from pyclan import errors
 from pyclan import parse
 
 class ClanFile(object):
-    """ A class to represent a given cha file """
+    """A class to represent a given cha file"""
 
     get_user_comments = filters.user_comments
     get_conv_block = filters.conv_block
@@ -51,30 +51,30 @@ class ClanFile(object):
 
 
     def insert_line(self, line, index):
-        """
-        Insert a ClanLine into the middle of a ClanFile at
+        """Insert a ClanLine into the middle of a ClanFile at
         a given index.
-
+        
         If index == 15, then the current ClanLine at 15 will
         be pushed to 16, and the new ClanLine will take its
         place.
 
-        Args:
-            line: ClanLine object to insert into the ClanFile
-            index: index to insert at
+        :param line: ClanLine object to insert into the ClanFile
+        :param index: index to insert at
+
         """
         self.line_map.insert(index, line)
         for i, x in enumerate(self.line_map):
             x.index = i
 
     def annotations(self):
-        """
-        Pull out all the annotations and return them as a list
+        """Pull out all the annotations and return them as a list
         of Annotation objects. Annotations should be in this form:
-
+        
                 word x_y_ZZZ
-
+        
         :return: a list of Annotation objects
+
+
         """
         if self.annotated:
             return self._flat_annotations()
@@ -84,6 +84,7 @@ class ClanFile(object):
 
 
     def _flat_annotations(self):
+        """ """
         result = []
         for line in self.line_map:
             if line.annotations:
@@ -91,13 +92,14 @@ class ClanFile(object):
         return result
 
     def annotate(self):
-        """
-        Run a pass through the entire file, line by line, setting the
+        """Run a pass through the entire file, line by line, setting the
         line.annotations field for each ClanLine in self.line_map.
-
+        
         Note: the file should be flat for this to return meaningful results.
                 you can ensure this by calling self.flatten()
         :return:
+
+
         """
         for line in self.line_map:
             if line.is_tier_line:
@@ -107,9 +109,10 @@ class ClanFile(object):
         self.annotated = True
 
     def assign_pho(self):
-        """
-        Assign a pho value to the CHI annotation that it belongs to.
+        """Assign a pho value to the CHI annotation that it belongs to.
         :return:
+
+
         """
         if not self.annotated:
             raise Exception("you need to call self.annotate() before being able to assign pho's to CHI annotations")
@@ -131,6 +134,11 @@ class ClanFile(object):
                 chis[idx].pho_annot = pho
 
     def _join_annot_cells(self, cells):
+        """
+
+        :param cells: 
+
+        """
         chunked = {}
         for cell in cells:
             timestamp = "{}_{}".format(cell.onset, cell.offset)
@@ -141,6 +149,15 @@ class ClanFile(object):
         return chunked
 
     def _extract_annots(self, tier, onset, offset, line, index=0):
+        """
+
+        :param tier: 
+        :param onset: 
+        :param offset: 
+        :param line: 
+        :param index:  (Default value = 0)
+
+        """
         annots = []
         codes = elements.code_regx.findall(line)
         if codes:
@@ -170,6 +187,7 @@ class ClanFile(object):
 
 
     def clear_annotations(self):
+        """ """
         for line in self.line_map:
             if line.annotations:
                 for annot in line.annotations:
@@ -177,9 +195,10 @@ class ClanFile(object):
                     line.content = line.line.replace(annot.orig_string, "")
 
     def reindex(self):
-        """
-        Assign new indices to all the ClanLines in the line_map. This also assigns
+        """Assign new indices to all the ClanLines in the line_map. This also assigns
         a new index to each annotation in every ClanLine.annotations
+
+
         """
         for idx, line in enumerate(self.line_map):
             line.index = idx
@@ -188,17 +207,24 @@ class ClanFile(object):
                     x.line_num = idx
 
     def get_header(self):
+        """ """
         return [line for line in self.line_map if line.is_header]
 
     def length(self):
-        """
-        Get the length of the CLAN file
+        """Get the length of the CLAN file
         :return: number of lines in the file
+
+
         """
         return len(self.line_map)
 
 
     def write_to_cha(self, path):
+        """
+
+        :param path: 
+
+        """
         with open(path, "wb") as output:
             for line in self.line_map:
                 if len(line.breaks)>1:
@@ -210,14 +236,14 @@ class ClanFile(object):
 
     def new_file_from_blocks(self, path, blocks=[], rewrite_timestamps=False,
                              begin=1, end=None):
-        """
-        This produces a new cha file with only the blocks specified
+        """This produces a new cha file with only the blocks specified
 
-        Args:
-            path: path to the new output cha file
-            blocks: list of indices of blocks
-            rewrite_timestamps: if True, then timestamps will be rewritten to
-                                start from 0 and be contiguous with each other
+        :param path: path to the new output cha file
+        :param blocks: list of indices of blocks (Default value = [])
+        :param rewrite_timestamps: if True, then timestamps will be rewritten to
+                                start from 0 and be contiguous with each other (Default value = False)
+        :param begin:  (Default value = 1)
+        :param end:  (Default value = None)
 
         """
         blocks = sorted(blocks) #make sure they're in ascending order
@@ -239,6 +265,14 @@ class ClanFile(object):
             output.write(self.end_tag)
 
     def new_file_from_time(self, path, onset, offset, rewrite_timestamps=True):
+        """
+
+        :param path: 
+        :param onset: 
+        :param offset: 
+        :param rewrite_timestamps:  (Default value = True)
+
+        """
 
         with open(path, "wb") as output:
             header = self.get_header()
@@ -254,12 +288,14 @@ class ClanFile(object):
             output.write(self.end_tag)
 
     def phos(self):
+        """ """
         phos = []
         for line in self.line_map:
             phos += line.phos
         return phos
 
     def create_pho_chi_linkage(self):
+        """ """
         self.annotate()
         annots = self.annotations()
         if not annots:
@@ -280,6 +316,11 @@ class ClanFile(object):
                 match[pho.annotation_ref].pho = pho
 
     def basic_level(self, out):
+        """
+
+        :param out: 
+
+        """
         annots = []
         for line in self.line_map:
             if line.is_tier_line and not line.in_skip_region:
