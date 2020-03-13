@@ -1,5 +1,5 @@
-from . import elements
-from . import errors
+import elements
+import errors
 
 
 def parse_file(self, line_list, breaks):
