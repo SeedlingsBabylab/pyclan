@@ -518,6 +518,3 @@ def reindex_ts(self):
             self.ts_index[ts] = [line]
 
 
-from elements import *
-from clanfile import *
-from errors import *
