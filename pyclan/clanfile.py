@@ -8,6 +8,7 @@ from pyclan import errors
 from pyclan import parse
 
 class ClanFile(object):
+    """ A class to represent a given cha file """
 
     get_user_comments = filters.user_comments
     get_conv_block = filters.conv_block

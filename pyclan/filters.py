@@ -1,6 +1,7 @@
 import re
 import codecheck
 from collections import OrderedDict
+from regexes import *
 
 def check_annotation(annot):
     error = []
