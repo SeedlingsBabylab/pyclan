@@ -2,6 +2,9 @@ import re
 import codecheck
 from collections import OrderedDict
 from regexes import *
+from errors import ParseError
+from pdb import set_trace
+import os.path
 
 def check_annotation(annot):
     error = []

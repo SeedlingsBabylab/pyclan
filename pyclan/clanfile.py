@@ -7,6 +7,10 @@ from pyclan import elements
 from pyclan import errors
 from pyclan import parse
 
+from pdb import set_trace 
+import traceback
+import sys
+
 class ClanFile(object):
     """A class to represent a given cha file"""
 
@@ -35,15 +39,14 @@ class ClanFile(object):
         self.full_block_range = False
         self.block_index = [] # list of all the full block indices in this file
         self.ts_index = {}
-        # try:
-        # print("here")
-        flattenedlines, breaks= filters._preparse_flatten(self.clan_path)
-        # print("there")
+        try:
+            flattenedlines, breaks= filters._preparse_flatten(self.clan_path)
+        except errors.ParseError:
+            traceback.print_exc()
+            exit(1)
+
         self.line_map = self.parse_file(flattenedlines, breaks)
-        # print("and back")
-        # except Exception as e:
-            # print e
-            # print "\n\nParsing Error:\n\nfile: {}\nline: {}\nonset:{}\n\n".format(self.filename, e.index, e.last_line.onset)
+        print("and back")
         self.total_time = sum(line.total_time for line in self.line_map if line.is_tier_line)
         self.flat = False
         self.annotated = False
