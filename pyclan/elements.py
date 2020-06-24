@@ -1,6 +1,6 @@
 import re
-import filters
-from regexes import *
+from . import filters
+from .regexes import *
 
 
 class ClanLine(object):

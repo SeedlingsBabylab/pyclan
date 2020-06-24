@@ -1,8 +1,8 @@
 import re
 import codecheck
 from collections import OrderedDict
-from regexes import *
-from errors import ParseError
+from .regexes import *
+from .errors import ParseError
 from pdb import set_trace
 import os.path
 
@@ -53,7 +53,7 @@ def conv_blocks(self, begin=1, end=None, select=None):
         end = self.num_blocks
 
     blocks = OrderedDict()
-    select = select if select else range(begin, end+1)
+    select = select if select else list(range(begin, end+1))
 
     for x in select:
         blocks[x] = []
@@ -62,7 +62,7 @@ def conv_blocks(self, begin=1, end=None, select=None):
         if line.conv_block_num in select:
             blocks[line.conv_block_num].append(line)
 
-    blocks = [ClanBlock(block_num, lines) for block_num, lines in blocks.items()]
+    blocks = [ClanBlock(block_num, lines) for block_num, lines in list(blocks.items())]
     return BlockGroup(blocks)
 
 
