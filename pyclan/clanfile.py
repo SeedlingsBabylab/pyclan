@@ -182,8 +182,8 @@ class ClanFile(object):
     def __collect_multiline(self, multiline):
         chunked_lines = self._join_annot_cells(multiline)
         results = []
-        for timestamp, joined_line in chunked_lines.items():
-            t = map(int, timestamp.split("_"))
+        for timestamp, joined_line in list(chunked_lines.items()):
+            t = list(map(int, timestamp.split("_")))
             results += self._extract_annots(multiline[0].tier, t[0], t[1], joined_line)
         del multiline[:]
         return results
@@ -334,9 +334,9 @@ class ClanFile(object):
         for annot in annots:
             error.extend(filters.check_annotation(annot))
         if error:
-            print "Error(s) in annotation:\n"
+            print("Error(s) in annotation:\n")
             for err in error:
-                print err + "\n"
+                print(err + "\n")
             return
         with open(out, "wb") as output:
             writer = csv.writer(output)

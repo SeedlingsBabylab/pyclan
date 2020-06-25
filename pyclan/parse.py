@@ -1,5 +1,5 @@
-import elements
-import errors
+from . import elements
+from . import errors
 
 
 def parse_file(self, line_list, breaks):
@@ -252,8 +252,8 @@ def parse_file(self, line_list, breaks):
                 self.ts_index[ts] = [clan_line]
 
             last_line = clan_line
-    except Exception, e:
-        print e
+    except Exception as e:
+        print(e)
         raise errors.ParseError(index, last_line)
 
     self.num_blocks = current_conv_block
