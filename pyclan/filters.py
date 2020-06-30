@@ -1,7 +1,7 @@
 import re
-import codecheck
 from collections import OrderedDict
 from .regexes import *
+from .checker import *
 from .errors import ParseError
 from pdb import set_trace
 import os.path
@@ -11,14 +11,14 @@ def check_annotation(annot):
     # for annot in annotArr:
     try:
         if "*" in annot.tier:
-            assert(codecheck.check_tier_audio(annot.tier))
+            assert(check_tier_audio(annot.tier))
         else:
-            assert(codecheck.check_tier_audio("*"+annot.tier))
-        assert(codecheck.check_word_audio(annot.word))
-        assert(codecheck.check_utterance_type_audio(annot.utt_type))
-        assert(codecheck.check_object_present_audio(annot.present))
-        assert(codecheck.check_speaker_audio(annot.speaker))
-        assert(codecheck.check_onset_offset(str(annot.onset), str(annot.offset)))
+            assert(check_tier_audio("*"+annot.tier))
+        assert(check_word_audio(annot.word))
+        assert(check_utterance_type_audio(annot.utt_type))
+        assert(check_object_present_audio(annot.present))
+        assert(check_speaker_audio(annot.speaker))
+        assert(check_onset_offset(str(annot.onset), str(annot.offset)))
     except AssertionError:
         error.append(annot.__repr__() + " " + str(annot.onset) + " " + str(annot.offset))
             #print annot.tier, annot.word, annot.utt_type, annot.present, annot.speaker, str(annot.onset), str(annot.offset)
