@@ -1,2 +1,0 @@
--e .
-git+git@github.com:SeedlingsBabylab/codecheck.git#egg=codecheck
