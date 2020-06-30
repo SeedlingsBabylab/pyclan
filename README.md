@@ -1,9 +1,4 @@
-# pyclan compatible with python3.7
-
-Changes made to forked pyclan:
-- upgraded to python3.7
-- integrated codecheck package
-  
+# pyclan
 
 This is a Python library for working with CHAT (.cha) files that are used by the CLAN audio annotation program.
 
@@ -18,6 +13,11 @@ clone this repo, then inside the main folder, run:
 
 ```
 $: python -m pip install .
+```
+
+or pip install the repo directly:
+```
+pip install git+https://github.com/SeedlingsBabylab/pyclan.git
 ```
 
 ## usage examples:
