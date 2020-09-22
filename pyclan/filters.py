@@ -1,5 +1,5 @@
 import re
-import codecheck
+from pyclan import codecheck
 from collections import OrderedDict
 from .regexes import *
 from .errors import ParseError

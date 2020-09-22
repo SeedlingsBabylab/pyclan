@@ -228,7 +228,7 @@ class ClanFile(object):
         :param path: 
 
         """
-        with open(path, "wb") as output:
+        with open(path, "w") as output:
             for line in self.line_map:
                 if len(line.breaks)>1:
                     for i in range(1, len(line.breaks)):
@@ -251,7 +251,7 @@ class ClanFile(object):
         """
         blocks = sorted(blocks) #make sure they're in ascending order
 
-        with open(path, "wb") as output:
+        with open(path, "w") as output:
             header = self.get_header()
             if blocks:
                 blocks = self.get_conv_blocks(select=blocks)
@@ -277,7 +277,7 @@ class ClanFile(object):
 
         """
 
-        with open(path, "wb") as output:
+        with open(path, "w") as output:
             header = self.get_header()
             lines = self.get_within_time(begin=onset, end=offset)
             if rewrite_timestamps:
@@ -338,7 +338,7 @@ class ClanFile(object):
             for err in error:
                 print(err + "\n")
             return
-        with open(out, "wb") as output:
+        with open(out, "w") as output:
             writer = csv.writer(output)
             writer.writerow(["tier", "word", "utterance_type", "object_present", "speaker", "timestamp", "annotation_id", "basic_level"])
             for a in annots:
