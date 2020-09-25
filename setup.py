@@ -1,4 +1,4 @@
-from distutils.core import setup
+from setuptools import setup, find_packages
 
 __version__ = '0.2'
 
@@ -9,5 +9,5 @@ setup(name='pyclan',
       author_email='andrei.amatuni@gmail.com',
       license="MIT",
       url='https://github.com/SeedlingsBabylab/pyclan',
-      packages=["pyclan"]
+      packages=find_packages()
 )
