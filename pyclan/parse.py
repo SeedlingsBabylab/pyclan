@@ -191,10 +191,12 @@ def parse_file(self, line_list, breaks):
 
                 elif line.startswith("%xdb:"):
                     clan_line.xdb_line = True
+                    clan_line.parent_tier = last_line.tier
                     xdb_regx_result = elements.xdb_regx.search(line)
                     if xdb_regx_result:
                         clan_line.xdb_average = xdb_regx_result.group(1)
                         clan_line.xdb_peak = xdb_regx_result.group(2)
+                        clan_line.content = line.split("\t", 1)[1].replace(newline_str, "")
 
                 else:
                     clan_line.is_other_comment = True

@@ -42,6 +42,7 @@ class ClanLine(object):
         self._has_timestamp = False
         self.breaks = []
         self.in_skip_region = None
+        self.parent_tier = None
 
         self.annotations = []
         self.user_comment = None
