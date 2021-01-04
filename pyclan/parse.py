@@ -98,51 +98,7 @@ def parse_file(self, line_list, breaks):
                 line_map.append(clan_line)
                 last_line = clan_line
                 continue
-            elif line.startswith("@"):
-                block_delimiter = False
-                if line.startswith("@Bg") or line.startswith("@Eg"):
-                    conv_block_regx_result = elements.block_regx.search(line)
-                    paus_block_regx_result = elements.pause_regx.search(line)
-                    if conv_block_regx_result:
-                        current_conv_block = int(conv_block_regx_result.group(1))
-                        block_delimiter = True
-                        if "@Bg" in line:
-                            last_conv_block_type = "@Bg"
-                            last_conv_block_num = current_conv_block
-                            conv_block_started = True
-                            conv_block_ended = False
-
-                        if "@Eg" in line:
-                            if last_conv_block_type == "@Bg" and last_conv_block_num == current_conv_block:
-                                self.num_full_blocks += 1
-                                self.block_index.append(current_conv_block)
-                            last_conv_block_type = "@Eg"
-                            last_conv_block_num = current_conv_block
-                            conv_block_started = False
-                            conv_block_ended = True
-                            clan_line.is_conv_block_delimiter = True
-                            clan_line.conv_block_num = current_conv_block
-                            clan_line.within_conv_block = True
-                            line_map.append(clan_line)
-                            last_line = clan_line
-                            if last_line:
-                                clan_line.onset = last_line.onset
-                                clan_line.offset = last_line.offset
-                            else:
-                                clan_line.onset = 0
-                                clan_line.offset = 0
-                            continue
-                    clan_line.is_conv_block_delimiter = block_delimiter
-                    if conv_block_started:
-                        clan_line.conv_block_num = current_conv_block
-                        clan_line.within_conv_block = True
-                    else:
-                        clan_line.conv_block_num = 0
-                    line_map.append(clan_line)
-                    last_line = clan_line
-                    continue
-
-                # clan_line.is_header = True
+                            # clan_line.is_header = True
                 if "@End" in line:
                     clan_line.is_end_header = True
 
