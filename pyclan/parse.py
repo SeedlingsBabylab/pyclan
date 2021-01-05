@@ -179,19 +179,19 @@ def parse_file(self, line_list, breaks):
                     clan_line.tier = line[1:4]
                     clan_line.content = line.split("\t")[1].replace(timestamp+newline_str, "")
                     clan_line.is_tier_line = True
-                # if line.startswith("\t"):
-                #     # clan_line.tier = line[1:4]
-                #     if last_line.tier:
-                #         clan_line.tier = last_line.tier
-                #     # if clan_line.multi_line_parent and clan_line.multi_line_parent.is_tier_line:
-                #     #     temp_line = clan_line.multi_line_parent
-                #     #     temp_line.annotations = self._extract_annots(temp_line.tier, onset, offset, temp_line.line)
-                #     #     while temp_line.multi_line_parent and temp_line.multi_line_parent.is_tier_line:
-                #     #         tempn = temp_line.multi_line_parent
-                #     #         tempn.annotations = self._extract_annots(tempn.tier, onset, offset, tempn.line)
-                #     #         temp_line = tempn
-                #     clan_line.content = line.split("\t")[1].replace(timestamp+newline_str, "")
-                #     clan_line.is_tier_line = True
+                if line.startswith("\t"):
+                    # clan_line.tier = line[1:4]
+                    if last_line.tier:
+                        clan_line.tier = last_line.tier
+                    # if clan_line.multi_line_parent and clan_line.multi_line_parent.is_tier_line:
+                    #     temp_line = clan_line.multi_line_parent
+                    #     temp_line.annotations = self._extract_annots(temp_line.tier, onset, offset, temp_line.line)
+                    #     while temp_line.multi_line_parent and temp_line.multi_line_parent.is_tier_line:
+                    #         tempn = temp_line.multi_line_parent
+                    #         tempn.annotations = self._extract_annots(tempn.tier, onset, offset, tempn.line)
+                    #         temp_line = tempn
+                    clan_line.content = line.split("\t")[1].replace(timestamp+newline_str, "")
+                    clan_line.is_tier_line = True
             else:
                 if line.startswith("*"):
                     clan_line.tier = line[1:4]
