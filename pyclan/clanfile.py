@@ -2,7 +2,6 @@ import csv
 import os
 import re
 
-from pyclan import filters
 from pyclan import elements
 from pyclan import errors
 from pyclan import parse
@@ -14,20 +13,20 @@ import sys
 class ClanFile(object):
     """A class to represent a given cha file"""
 
-    get_user_comments = filters.user_comments
-    get_conv_block = filters.conv_block
-    get_conv_blocks = filters.conv_blocks
-    get_tiers = filters.tier
-    get_within_time = filters.time
-    get_with_keyword = filters.get_with_keyword
-    get_with_speaker = filters.get_with_speaker
-    get_with_time = filters.get_with_time
-    replace_with_keyword = filters.replace_with_keyword
-    replace_comments = filters.replace_comment
-    shift_timestamps = filters.shift_timestamps
-    clear_pho_comments = filters.clear_pho
-    delete_pho_comments = filters.delete_pho
-    reindex_timestamps = filters.reindex_ts
+    get_user_comments = elements.user_comments
+    get_conv_block = elements.conv_block
+    get_conv_blocks = elements.conv_blocks
+    get_tiers = elements.tier
+    get_within_time = elements.time
+    get_with_keyword = elements.get_with_keyword
+    get_with_speaker = elements.get_with_speaker
+    get_with_time = elements.get_with_time
+    replace_with_keyword = elements.replace_with_keyword
+    replace_comments = elements.replace_comment
+    shift_timestamps = elements.shift_timestamps
+    clear_pho_comments = elements.clear_pho
+    delete_pho_comments = elements.delete_pho
+    reindex_timestamps = elements.reindex_ts
     parse_file = parse.parse_file
 
     end_tag = "@End"
@@ -40,7 +39,7 @@ class ClanFile(object):
         self.block_index = [] # list of all the full block indices in this file
         self.ts_index = {}
         try:
-            flattenedlines, breaks= filters._preparse_flatten(self.clan_path)
+            flattenedlines, breaks= elements._preparse_flatten(self.clan_path)
         except errors.ParseError:
             traceback.print_exc()
             exit(1)
@@ -332,7 +331,7 @@ class ClanFile(object):
                                                         line.index)
         error = []
         for annot in annots:
-            error.extend(filters.check_annotation(annot))
+            error.extend(elements.check_annotation(annot))
         if error:
             print("Error(s) in annotation:\n")
             for err in error:
