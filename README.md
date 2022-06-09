@@ -14,10 +14,8 @@ Note: the parser doesn't comply with the entire CHAT file specification. It impl
 
 ## install
 
-clone this repo, then inside the main folder, run:
-
 ```
-$: python -m pip install .
+$: pip install git+https://github.com/SeedlingsBabylab/pyclan.git
 ```
 
 ## usage examples:
