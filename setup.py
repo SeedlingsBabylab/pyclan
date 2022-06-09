@@ -6,8 +6,8 @@ __version__ = '0.2'
 install_requires = [
       'Distance==0.1.3',
       'mysql-connector==2.2.9',
-      'numpy>=1',
-      'pandas>=1',
+      'numpy',
+      'pandas==1',
       'python-dateutil==2.8.1',
       'pytz==2020.1',
       'six==1.15.0'
