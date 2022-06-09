@@ -7,7 +7,7 @@ install_requires = [
       'Distance==0.1.3',
       'mysql-connector==2.2.9',
       'numpy',
-      'pandas==1',
+      'pandas',
       'python-dateutil==2.8.1',
       'pytz==2020.1',
       'six==1.15.0'
