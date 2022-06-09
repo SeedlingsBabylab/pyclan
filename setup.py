@@ -8,9 +8,8 @@ install_requires = [
       'mysql-connector==2.2.9',
       'numpy==1.19.2',
       'pandas==1.1.2',
-      'pyclan @ git+https://git@github.com:SeedlingsBabylab/pyclan.git@c7ff1f7e50ff488f7ffa4e317dec1c2f9a421dca#egg=pyclan'
-      'python-dateutil==2.8.1'
-      'pytz==2020.1'
+      'python-dateutil==2.8.1',
+      'pytz==2020.1',
       'six==1.15.0'
 ]
 
