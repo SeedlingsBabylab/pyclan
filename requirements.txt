@@ -1,6 +1,6 @@
 Distance==0.1.3
 mysql-connector==2.2.9
-numpy==1.19.2
+numpy==1.21.0
 pandas==1.1.2
 -e git+git@github.com:SeedlingsBabylab/pyclan.git@c7ff1f7e50ff488f7ffa4e317dec1c2f9a421dca#egg=pyclan
 python-dateutil==2.8.1
